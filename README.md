@@ -37,8 +37,8 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
     - 크로스플랫폼(모바일까지)
 - IoT 연동 : 아두이노, 라즈베리파이 가능
 
-### C# 언어 난이도
-- C > C++ > Java > C# > Python
+- C# 언어 난이도
+    - C > C++ > Java > C# > Python
 
 ### C# 기본 구현
 1. VIsual Studio 실행
@@ -56,7 +56,7 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 7. 새 프로젝트 구성 : 프로젝트 명, 저장 위치, 솔루션 이름 지정
 8. 추가 정보 : 프레임워크 선택, 최상위 문 사용 안함 (Do not uses top-level statement) 체크X
 ![alt text](image-4.png)
-9. 만들기 버튼 클릭
+9. 만들기 버튼 클릭 - [소스](./basic/Ex01_basic/ConsoleApp1/Program.cs)
 ```cs
 // 최신방식 - 처음 학습시에 도움이 안되는 방식
 Console.WriteLine("Hello, World!");
@@ -66,7 +66,7 @@ Console.WriteLine("Hello, World!");
 
 ### C# 기본 문법
 
-- 기본문법
+- 기본문법 - [소스](./basic/Ex01_basic/ConsoleApp2/Program.cs)
 
     ```cs
     using System;
@@ -94,7 +94,7 @@ Console.WriteLine("Hello, World!");
 
 - 주석 : 한 줄 주석(//), 여러줄 주석(/* */), XML주석(///)
 
-- 변수와 타입
+- 변수와 타입 - [소스](./basic/Prac03Syntax/Prac03Syntax/Program.cs)
     - 초기화 : `접근제한자 타입 변수명`
     - 기본타입(구조체) : bool, sbyte, byte, short, unshort, int, uint, long, ulong, float, double, decimal, char, bool
     - 동일한 구조체 타입 : Bolean, Int16~128, Single, Double
@@ -154,7 +154,7 @@ Console.WriteLine("Hello, World!");
     - set만 있으면 : 속성값 변경만 가능
     - get; set; : 둘 다 가능
 
-- 컬렉션
+- 컬렉션 - [소스](./basic/Ex01_basic/Prac04Collection/Program.cs)
     - 배열, 리스트 등 여러요소를 묶어서 사용하는 구조
     - ArrayList, List, Hashtable, Dictionary, Stach, Queue, Hashset, ...
     - 배열보다 컬렉션을 사용할 것
@@ -188,7 +188,7 @@ Console.WriteLine("Hello, World!");
 
 ### 윈폼즈 앱 구현
 
-1. 새 프로젝트
+1. 새 프로젝트 - [위치](./winapp/DotNet02Test/)
 2. 프로젝트명, 위치, 솔루션명 지정해서 다음
 3. 프레임워크 .NET 10.0 선택 후 만들기
 4. IDE 툴에서 펑션키 F4로 속성창 오픈
@@ -201,3 +201,17 @@ Console.WriteLine("Hello, World!");
 8. 도구상자의 컨트롤을 디자인 화면으로 드래그앤 드롭 하여 구성
 9. 컨트롤의 속성 변경으로 디자인
 10. 컨트롤의 이벤트 추가로 기능 구현
+11. 디자이너 화면 `f7` <--> 비하인드코드 `shift + f7`
+12. `ctrl + space`, `alt + enter` VS(VS COde 포함)에가 가장 많이쓰는 단축키
+
+![alt text](image-8.png)
+
+
+### 윈폼즈앱 용어
+- 모달/모달리스 : 부모창과 자식창의 관계
+    - 모달(Modal) : 서브(모달)창 종려 전에는 부모창 제어 불가
+    - 모달리스(Modaless) : 서브창 종료와 관계없이 부모창 제어 가능
+    
+- 속성 변경방법
+    - 디자인타임 변경 : [디자인] 작업 시 속성창의 송성값 변경
+    - 런타임 변경 : 비하인드 코드 내에서 속성값을 변경, 실행 시 변경되는 것

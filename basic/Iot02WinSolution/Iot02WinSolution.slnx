@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DotNet03GuessNum/DotNet03GuessNum.csproj" />
+  <Project Path="DotNet04ControlsApp/DotNet04ControlsApp.csproj" />
+</Solution>
