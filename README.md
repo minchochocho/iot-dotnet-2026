@@ -186,7 +186,7 @@ Console.WriteLine("Hello, World!");
     - .NET Framework : .NET Framework 4.8 이전 구형 개발방식
     - 기본 : .NET 5.0 이상의 최신 개발방식
 
-### 윈폼즈 앱 구현
+### 윈폼즈 앱 구현 순서
 
 1. 새 프로젝트 - [위치](./winapp/DotNet02Test/)
 2. 프로젝트명, 위치, 솔루션명 지정해서 다음
@@ -206,6 +206,22 @@ Console.WriteLine("Hello, World!");
 
 ![alt text](image-8.png)
 
+### 트러블 슈팅
+![alt text](image-10.png)
+
+- Visual Studio 2022이상에서 윈폼즈 개발시 디자인화면에서 버튼을 더블클릭 이벤트 추가할 경우 발생하는 오류
+- Designer.cs에 생성된 이벤트 선언문과 .cs파일에 이벤트핸들러가 생성되지 않아서 발생
+
+#### 첫번째 방법
+1. Designer.cs내 `Windows Form Designer generated code` 영역을 확장
+2. 빨간색 밑줄이 그인 오류 이벤트 이름 삭제
+3. VS 재시작
+
+#### 두번째 방법
+1. Designer.cs내 `Windows Form Designer generated code` 영역을 확장
+2. 빨간색 밑줄이 그인 오류 이벤트에서 `Alt+Enter`
+3. 메서드 생성
+4. .cs로 메서드 이전
 
 ### 윈폼즈앱 용어
 - 모달/모달리스 : 부모창과 자식창의 관계
@@ -215,3 +231,74 @@ Console.WriteLine("Hello, World!");
 - 속성 변경방법
     - 디자인타임 변경 : [디자인] 작업 시 속성창의 송성값 변경
     - 런타임 변경 : 비하인드 코드 내에서 속성값을 변경, 실행 시 변경되는 것
+
+### 스레드 사용
+- 윈앱 자체가 UI 스레드를 사용
+- 반복작업을 스레드없이 수행하면 UI 스레드와 충돌발생 - (응답 없음)
+- C#에서 스레드 사용방법
+    - 스레드 클래스 사용 - 개발자 코딩 필요
+    - 백그라운드워커 클래스 사용 - 필수요소만 처리
+    > 백그라운드 워커가 훨씬 쉬움
+
+- 백그라운드워커 구현법
+    1. 워커_DoWork - 첫 실행하는 부분
+    2. 워커_ProgressChanged - 진행사항 UI 스레드로 전달
+    3. 워커_RunWorkerComplete - 스레드 완료 후 처리할 것들 구현
+
+- async/await 키워드로 진행
+    - 비동기 처리를 지원하는 메서드만 사용가능
+
+### 윈앱 기본컨트롤 예제앱
+
+- 라벨, 콤보박스, 체크박스, 텍스트박스(멀티, 싱글라인), 버튼
+- 메시지박스, 다이얼로그
+- 트랙바, 진행바
+- 트리뷰, 리스트뷰, 이미지리스트, 픽쳐박스
+- 백그라운드워커(스레드)
+- 리치텍스트박스
+![alt text](image-9.png)
+
+### 비동기 처리 앱
+- 비동기로 호출할 메서드 앞에 await 키워드 추가
+- 비동기 메서드를 호출하는 부모메서드 접근제어키워드와 리턴값 사이에 async 키워드 추가
+- 일반 메서드를 비동기 메서드로 변경 (일반 메서드 뒤에 async 포함)
+- 리턴값이 있을 때 변경 long -> Task<long>
+- 아주 간단하게 스레드 처리가능
+
+- 동기화 복사는 복사 기능 도중, 다른 이벤트 사용불가
+- 비동기화는 사용 가능
+
+![alt text](image-11.png)
+
+### DB연동 앱
+- MySQL bookrentalshop 연동
+
+#### 외부 라이브러리 활용
+- 윈폼즈 앱 개발시 직접 디자인 매우 어려움
+- 3rd 파이사에서 여러 라이브러리를 제공
+- 예전에는 따로 설치, 내 프로젝트에 붙여넣기
+- NuGet Pakage 존재 - Python pip와 동일한 기능
+
+#### NuGet 설치 순서
+1. 프로젝트 우클릭 > NuGet 패키지관리 클릭
+2. 찾아보기에서 필요한 라이브러리 검색
+3. 패키지 세부사항 > 종속성 현재 프로젝트 버전과 일치
+4. 설치 클릭, 번경내용 미리보기 확인
+5. 라이선스 허용여부 다이얼로그가 뜬다면, 허용
+
+#### DB 연동 구현
+1. NuGet 패키지 MySQLConnector 설치
+2. DatabaseHelper 클래스 생성. 작성
+- SelectBooks 메서드 작성 - [소스](./winapp/Iot02WinSolution/DotNet06DbBooksApp/DatabaseHelper.cs)
+3. DataGridView, Button 컨트롤 추가
+4. 버튼 클릭이벤트에 메서드 추가
+
+![alt text](image-12.png)
+
+### OpenAPI연동 앱
+- 미세먼지 모니터링앱
+- 국가교통정보 CCTV뷰 앱
+- IoT 모니터링앱
+
+
+### 라이브러리 만들기
