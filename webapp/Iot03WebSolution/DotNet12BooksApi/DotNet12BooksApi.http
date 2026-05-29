@@ -1,0 +1,6 @@
+@DotNet12BooksApi_HostAddress = http://localhost:5010
+
+GET {{DotNet12BooksApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
