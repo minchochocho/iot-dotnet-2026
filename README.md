@@ -420,7 +420,174 @@ Console.WriteLine("Hello, World!");
 ### 유니티 디지털트윈
 
 ## WPF
-- 
+
+### WPF 개요
+- Windows Presentation Foundation = UI프레임워크
+    - winForms보다 더 현대적인 UI 제작 가능
+    - 애니메이션, 2D/3D 그래픽 미디어적인 강력함
+    - 데이터(DB, JSON 등) 바인딩 기능 강력
+    - XAML(XML 기반 UI 설계방식)기반 디자인, 로직과 완전분리 가능
+    - UI와 로직의 완전분리를 위해 `MVVM 패턴` 사용이 쉬움
+
+### WPF 특징
+
+- XAML 사용
+    ```xml
+    <Button content="클릭" width ="100" Height="40">
+    ```
+
+    - xaml 디자이너
+    ![alt text](image-17.png)
+
+- GPU 가속 렌더링
+    - WinForm CPU기반 GDI+ 렌더링으로 복잡하고 느렸음
+    - DirecX 기반으로 그래픽 처리가 부드러움
+    - 애니메이션, 3D, 반투명효과, 그림자, 블러...
+
+- 스타일, 테마 적용이 쉬움
+    - XML 기반, HTML의 CSS와 유사
+    - 디자인 자유도가 아주 높음
+
+### WPF 구성
+- App.xaml : 프로그램 시작점(static void Main과 유사)
+    - App.xaml.cs : 프로그램 시작점에 들어가는 초기화 로직
+- MainWindow.xaml : 메인폼 디자인과 동일
+    - MainWindow.xaml.cs : 코드비하인드
+
+### WPF MainWindow.xaml 디자인
+1. `Grid`, StackPanel, Canvas 등으로 화면 구역 나누기
+2. 구역별로 컨트롤 배치
+3. xaml 수정
+    - Blend for Visual Studio에서 디자이너가 작업
+    - Visual Studio에 반영
+4. xaml.cs 비하인드 코드 작성
+    - 모든 객체는 Margin(외부여백), Padding(내부여백)
+    - Achoring 표시 : 체인이 연결/끊김으로 표시
+![alt text](image-18.png)
+
+    - 그리드를 나누는 표시
+    - 각 나눈 영역은 n배(*)로 표시
+    - *가 없으면 픽셀 고정 사이즈
+![alt text](image-19.png)
+
+5. 새 창 추가
+6. App.xaml에서 시작하는 창을 변경
+7. xaml은 대부분 도구상자, 속성을 사용하는 것보다 직접 xaml코딩으로 디자인을 많이 진행
+
+### 네비게이션 앱
+
+- 하나의 창에 여러 페이지를 전환하면서 사용하는 방식의 앱
+![alt text](image-20.png)
+
+#### 화면 레이아웃 구성
+- Grid  : 가장 기본. 내부들어오는 객체가 그리드셸을 가득 채움(Margin이 없을때)
+    - Margin : 숫자하나(상하좌우 동일 여백), 두개(좌우/상하), 네개(좌/상/우/하, 시계방향)
+- StackPanel : 내부의 객체가 순차적으로 쌓임. 수평/수직
+    - Orientation="Vertical"이 기본
+- DockPanel : 내부의 객체를 상하좌우 중앙으로 분리
+    - DockPanel.Dock에 Left, Right, Top, Bottom으로 위치지정
+- Canvas : 
+
+#### 이미지, 동영상
+- 이미지
+    - 솔루션 탐색기 이미지 선택, 속성 > 빌드 작업 `리소스` 변경
+- 동영상
+    - 솔루션 탐색기 동영상 선택, 속성 > 빌드 작업 `내용` 변경
+    - 출력 디렉토리로 복사 `새 버전이면 복사`, `항상 복사` 중 선택
+    - bin 아래 debug/release 폴더에 복사
+    - MediaElement Source 할당작업을 코드 비하인드에서 처리
+
+#### 컨트롤 디자인
+
+- 일반 버튼
+
+```xml
+<Button Margin="50" Click="Button_Click" Content="Press Me">
+</Button>
+```
+![alt text](image-21.png)
+
+- Button.Template 속성을 설정
+
+```xml
+<Button Margin="50" Click="Button_Click" Content="Press Me">
+    <Button.Template>
+        <ControlTemplate TargetType="Button">
+            <Grid>
+                <Rectangle RadiusX="12" RadiusY="12" 
+                           Fill="#25A3FB" Stroke="DarkBlue" StrokeThickness="4" />
+                <Label Content="{TemplateBinding Content}" Foreground="White" FontSize="20" FontWeight="ExtraBold"                                   
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ControlTemplate>
+    </Button.Template>
+</Button>
+```
+
+![alt text](image-22.png)
+
+- ControlTemplate TargetType을 Button으로 지정
+- 보통 Grid(객체들이 겹쳐서 표현되기 때문) 안에 여러 객체를 위치
+- 부모객체(Button)의 속성을 가져다 쓰려면 `{TemplateBinding 속성명}` 형태로 설정
+
+- 그림자 추가
+
+```xml
+<Button Margin="50" Click="Button_Click" Content="Press Me">
+    <Button.Template>
+        <ControlTemplate TargetType="Button">
+            <Grid>
+                <Rectangle RadiusX="12" RadiusY="12" 
+                           Fill="#25A3FB" Stroke="DarkBlue" StrokeThickness="4">
+                    <Rectangle.Effect>
+                        <DropShadowEffect Color="Black"
+                                          BlurRadius="15"
+                                          ShadowDepth="5"
+                                          Direction="320"
+                                          Opacity="0.5" />
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Label Content="{TemplateBinding Content}" 
+                       Foreground="White" FontSize="20" FontWeight="ExtraBold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ControlTemplate>
+    </Button.Template>
+</Button>
+```
+![alt text](image-23.png)
+
+#### 리소스
+
+- 컨트롤 디자인은 하나의 객체만 가능
+- 컨트롤 디자인을 적용하려면 객체마다 전부 복사해야 함
+- 적용방법
+    1. 리소스 생성시 해당 페이지 내 객체들만 적용
+    2. App.xaml에 리소스를 생성시 프로젝트 내 모든 객체에 적용
+    3. *.xaml로 리소스 파일 생성 후, 코드내에서 불러와 적용
+
+- Page.Resources, Window.Resources, Application.Resources 태그 내에서 작성
+
+```xml
+<!-- 기본틀 -->
+<Style x:Key="BlueShadowButtonStyle" TargetType="Button">
+    <Setter Property="Template">
+        <Setter.Value>
+            <!-- 컨트롤 디자인 내용 붙여넣으면 끝! -->
+            <!-- ControlTemplate 하위만 복사 -->
+        </Setter.Value>
+    </Setter>
+</Style>
+```
+
+- x:key를 삭제하면 페이지, 창, 프로젝트 내 모든 객체에 바로 적용
+![alt text](image-24.png)
+
+- Key를 적용하면 
+
+```xml
+
+```
 
 ### OpenAPI연동 앱
 - 미세먼지 모니터링앱
