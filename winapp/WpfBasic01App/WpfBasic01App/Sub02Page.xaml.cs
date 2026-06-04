@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace WpfBasic01App {
+namespace WpfBasic02Navi {
     /// <summary>
     /// Sub02Page.xaml에 대한 상호 작용 논리
     /// </summary>

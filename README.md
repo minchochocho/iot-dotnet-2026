@@ -557,7 +557,7 @@ Console.WriteLine("Hello, World!");
 ```
 ![alt text](image-23.png)
 
-#### 리소스
+#### 리소스 디자인
 
 - 컨트롤 디자인은 하나의 객체만 가능
 - 컨트롤 디자인을 적용하려면 객체마다 전부 복사해야 함
@@ -584,10 +584,249 @@ Console.WriteLine("Hello, World!");
 ![alt text](image-24.png)
 
 - Key를 적용하면 
+    - `Style="{StaticResource BlueShadowButtonStyle}"`
 
+- 리소스 파일로 저장하고 로드하기
 ```xml
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- x:Key 는 나중에 -->
+    <Style TargetType="Button">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Rectangle RadiusX="12" RadiusY="12" 
+    Fill="#25A3FB" Stroke="DarkBlue" StrokeThickness="4">
+                            <Rectangle.Effect>
+                                <DropShadowEffect Color="Black"
+                   BlurRadius="15"
+                   ShadowDepth="5"
+                   Direction="320"
+                   Opacity="0.5" />
+                            </Rectangle.Effect>
+                        </Rectangle>
+                        <Label Content="{TemplateBinding Content}" 
+Foreground="White" FontSize="20" FontWeight="ExtraBold"
+HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+```
+App.xaml에서 로드 - 최종방식
+```xml
+<Application.Resources>
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="/ButtonStyles.xaml" />
+        </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+</Application.Resources>
+```
+
+### Modern Design 적용
+
+### 데이터바인딩
+
+- 현재 대부분 앱은 데이터 중심
+    - 데이터저장소(DB, 파일시스템, 클라우드, OpenAPI)의 데이터를 가져와서 표시
+    - 신규, 변경, 저장소에 다시 저장
+
+- 바인딩 패턴
+    - Early Binding(Static) - 컴파일 시점에서 바인딩 결정
+    - `Lazy Binding(dynamic)` - 런타임 시점에서 바인딩 결정
+        - Lazy Binding을 많이 사용
+
+- 바인딩 방법
+```xml
+<TextBox Text = "{Binding 속성값}">
+
+<TextBox Text = "{Binding Path = "속성값"}">
+
+<!-- 컨트롤명에 속하는 속성값이 표시, 여기에 새 값을 입력하면 컨트롤이 상호작용 -->
+<TextBox Text = "{Binding Source = {StaticResource 컨트롤명}, Path=속성값}">
 
 ```
+
+- 슬라이더와 프로그레스바 바인딩
+    ```xml
+    <Slider x:Name="SliderTest" Value="20" />
+    <ProgressBar Value="{Binding Value, ElementName=SliderTest}" />
+    ```
+
+- 바인딩 모드
+    | 모드 | 방향 | 내용 |
+    | :--: | :--: | :--- |
+    | OneTime | ViewModel(데이터) -> 화면(한번만) | 고정제목, 버전정보, 회사명 |
+    | OneWay | ViewModel(데이터) -> 화면(여러번) | 시계, 주식가격, 센서값, 상태표시 |
+    | OneWayToSource | 화면 -> ViewModel | 거의 사용안함(쓸일거의없음), 스크롤위치 저장 |
+    | `TwoWay` | ViewModel <-> 화면 | WPF WVVM핵심 |
+
+- 도구상자 컨트롤별 기본값
+    - TextBlock, Label, Rectangel, Image, ProgressBar는 OneWay 나머지는 거의 TwoWay
+    - 컨트롤을 직접 사용하지 않는 것 - OneWay
+    - 컨트롤을 사용자가 사용하는 것 - `TwoWay`
+
+- WPF 바인딩은 전통적인 윈폼 바인딩보다 코딩량(예외처리포함)이 적고 쉽게 구현가능
+
+- DataContext : 데이터를 찾아올 위치. 바인딩되는 데이터를 화면상에서 적용
+- ItemsSource : 목록 컬렉션을 어느 컨트롤에 할당하는지 
+
+#### 데이터그리드, 컨트롤 바인딩
+1. 필요 데이터 속성 생성
+    ```cs
+    public List<Employee> Employees { get; set; }  // employee 컬렉션 속성
+
+    public Employee SelectedEmployee { get; set; }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {   
+        // 데이터그리드 할당
+        this.DataContext = this;    // 코드 비하인드 데이터를 화면으로 보내기
+    }
+    ```
+
+2. xaml 데이터바인딩 작업
+    ```xml
+    <!-- UI 디자이너가 작업시 아래 내용 코딩-->
+    <DataGrid x:Name="DgrEmployees" Grid.Row="1" Grid.RowSpan="2" 
+                AutoGenerateColumns="True" Margin="5"
+                IsReadOnly="True" SelectionMode="Single" 
+                ItemsSource="{Binding Employees}"
+                SelectedItem="{Binding SelectedEmployee}">
+    </DataGrid>
+
+    <GroupBox Header="상세정보" 
+                DataContext="{Binding SelectedItem, ElementName=DgrEmployees}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <!-- 생략 -->
+        </Grid.RowDefinitions>
+
+        <TextBox Text="{Binding Id}" />
+        <TextBox Text="{Binding Name}" />
+        ...
+        <ComboBox ItemsSource="{Binding DataContext.Departments, 
+                  RelativeSource={RelativeSource AncestorType=Page}}" 
+                  SelectedItem="{Binding Department}"/>
+        <DatePicker Text="{Binding HireDate, Mode=TwoWay}" />
+        <CheckBox IsChecked="{Binding IsActive}"/>
+    </Grid>
+    ```
+
+3. UI설계에 바인딩할 속성이 다 지정
+![alt text](image-25.png)
+
+#### 콤보박스, 리스트박스 바인딩
+
+1. ItemsSource 바인딩 사용
+2. SelectedItem 속성 바인딩
+
+### Modern Design 적용
+
+- UI 디자인 프레임워크 사용
+    - **유료**
+    - DevExpress : 윈앱이 무겁게 실행, 
+    - Syncfusion, Telerik 등...
+    - **무료**
+    - [Material Design In XAML Toolkit]
+    - [HandyControl](https://github.com/handyorg/handycontrol)
+    - [MahApps](https://mahapps.com/) - 이걸로 진행
+
+#### MahApps 적용
+
+- NuGet 패키지로 설치
+    - MahApps.Metro, MahApps.Metro.IconPacks
+![alt text](image-26.png)
+
+- NuGet Package Console에서 설치
+    ```powershell
+    > Install-Package MahApps.Metro
+    ```
+
+- App.xzml에 리소스 딕셔너리 추가
+
+```xml
+<ResourceDictionary>
+    <ResourceDictionary.MergedDictionaries>
+        <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+        <!-- Theme setting -->
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+```
+
+- MainWindow.xaml xmlns추가, Window 태그 MetroWindow로 변경
+
+```xml
+<mah:MetroWindow x:Class="WpfBasic03UIApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    ...
+```
+- MainWindow.xaml.cs의 부모클래스 Window -> MetroWindow로 변경
+
+```cs
+using MahApps.Metro.Controls;
+
+namespace WpfBasic03UIApp {
+    
+    public partial class MainWindow : MetroWindow {
+```
+
+![alt text](image-27.png)
+
+- 테마 : Light/Dark, 엑센트 : Amber ~ Yellow 총 23개
+    - App.xaml의 Theme setting 리소스를 Light.Mauve 
+
+- MahApps.Metro가 제공하는 컨트롤 도구상자에서 드래그 사용
+- MahApps.Metro.Helper 기능으로 
+
+```xml
+<TextBox 
+    x:Name="TxtAuthor" Grid.Row="1" Margin="5"
+    mah:TextBoxHelper.AutoWatermark="True"
+    mah:TextBoxHelper.Watermark="저자"
+    mah:TextBoxHelper.ClearTextButton="True"
+/>
+<!--  -->
+```
+![alt text](image-28.png)
+
+- 컨트롤 스타일
+```xml
+<Button x:Name="BtnNew" Width="100" Content="신규" Margin="5"
+        Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}"/>
+```
+- 데이터그리드
+    - 왼쪽정렬 : 일반텍스트(길이 가변)
+    - 중앙정렬 : 코드종류(길이 동일)
+    - 오른쪽정렬 : 숫자, 가격 등
+![alt text](image-29.png)
+
+#### DB연동 객체 리스트
+- Connection
+- Command
+- DataAdapter
+- DataReader
+- DataTable
+
+#### DB연동 마무리
+
+- 데이터그리드 클릭 상세
+- 저장, 수정, 삭제 기능
+
+### 리소스 디자인 추가
+
 
 ### OpenAPI연동 앱
 - 미세먼지 모니터링앱

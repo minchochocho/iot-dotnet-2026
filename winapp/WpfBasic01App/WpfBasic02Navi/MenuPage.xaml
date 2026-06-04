@@ -16,10 +16,10 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal"> 
-            <Button x:Name="BtnMenu01" Content="SimpleControls Page" Margin="10, 10, 5, 10" Width="148" Click="BtnMenu01_Click"/>
-            <Button Content="Page02" Margin="5, 10, 5, 10" Width="148" Click="Button_Click"/>
-            <Button Content="Page03" Margin="5, 10, 5, 10" Width="148"/>
-            <Button Content="Page04" Margin="5, 10, 5, 10" Width="148"/>
+            <Button x:Name="BtnMenu01" Content="Controls Page" Margin="10, 10, 5, 10" Width="148" Click="BtnMenu01_Click"/>
+            <Button x:Name="BtnMenu02" Content="Content Page" Margin="5, 10, 5, 10" Width="148" Click="Button_Click"/>
+            <Button x:Name="BtnMenu03" Content="Binding Basic" Margin="5, 10, 5, 10" Width="148" Click="BtnMenu03_Click"/>
+            <Button x:Name="BtnMenu04" Content="Page04" Margin="5, 10, 5, 10" Width="148" Click="BtnMenu04_Click"/>
             <Button Content="Page05" Margin="5, 10, 10, 10" Width="148"/>
         </StackPanel>
 

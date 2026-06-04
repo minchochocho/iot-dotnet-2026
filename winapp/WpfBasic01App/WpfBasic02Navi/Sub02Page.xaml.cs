@@ -1,23 +1,29 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace WpfBasic01App {
-    /// <summary>
-    /// Sub02Page.xaml에 대한 상호 작용 논리
-    /// </summary>
+namespace WpfBasic02Navi {
     public partial class Sub02Page : Page {
-        // [수정] public 리스트는 함수 내부가 아니라, 이렇게 클래스 바로 아래에 선언해야 합니다.
-        private List<Employee> employees { get; set; }
+        public List<Employee> Employees { get; set; }  // employee 컬렉션 선언
+        public Employee SelectedEmployee { get; set; }
 
+        public List<string> Departments { get; set; }
+        public string SelectedDepartment { get; set; }
         public Sub02Page()
         {
             InitializeComponent();
         }
 
-        // [수정] WPF의 기본 Loaded 이벤트는 TouchEventArgs가 아니라 RoutedEventArgs를 사용합니다.
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // [수정] 여기서는 public을 빼고, 위에서 만든 리스트에 데이터만 채워줍니다.
+            Departments = new List<string>
+            {
+                "개발팀",
+                "영업팀",
+                "인사팀",
+                "디자인팀",
+                "경영팀"
+            };
+            // 초기화. DB에서 불러오는 것과 유사
             employees = new List<Employee>
             {
                 new Employee
@@ -67,8 +73,12 @@ namespace WpfBasic01App {
                 }
             };
 
+            // 데이터그리드 할당
+            this.DataContext = this;    // 코드비하인드의 모든 바인딩 객체를 화면상에서 사용하겠다라는 선언
             DgrEmployees.ItemsSource = employees;
 
         }
+
+
     }
 }

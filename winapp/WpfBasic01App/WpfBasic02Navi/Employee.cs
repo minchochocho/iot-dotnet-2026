@@ -1,4 +1,4 @@
-﻿namespace WpfBasic01App {
+﻿namespace WpfBasic02Navi {
     public class Employee {
         // public int id;            // 필드
         public int Id { get; set; } // PK와 동일
@@ -12,7 +12,6 @@
         public DateTime HireDate { get; set; }   // 입사일
 
         public bool IsActive { get; set; }  // 활동여부
-
 
 
     }

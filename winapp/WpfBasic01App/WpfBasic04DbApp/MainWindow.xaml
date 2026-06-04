@@ -1,0 +1,138 @@
+﻿<mah:MetroWindow x:Class="WpfBasic04DbApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:iconPacks ="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:local="clr-namespace:WpfBasic04DbApp"
+    mc:Ignorable="d"
+    Title="MainWindow" Height="450" Width="1100" Loaded="MetroWindow_Loaded">
+    <mah:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <iconPacks:PackIconLucide Kind="LibraryBig" Margin="10,7,0,0" Foreground="White"/>
+        </DataTemplate>
+    </mah:MetroWindow.IconTemplate>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="24"/>
+        </Grid.RowDefinitions>
+        <!-- d는 디자인에만 나옴 -->
+        <DataGrid x:Name="GrdBooks"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Margin="0,10,0,0"
+                  >
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="순번" Width="0.8*" Binding="{Binding book_idx}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="저자" Width="1*" Binding="{Binding author}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="책장르" Width="0.8*" Binding="{Binding div_name}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="책이름" Width="1.5*" Binding="{Binding book_name}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="출판일" Width="0.7*" Binding="{Binding release_dt, StringFormat='{}{0:yyyy-MM-dd}'}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="ISBN" Width="1*" Binding="{Binding isbn}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="책가격" Width="0.6*" Binding="{Binding price, StringFormat='{}{0:#,##0}원'}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
+        <!-- 높이를 370으로 고정할 거라면, 내부를 Grid(별 비율) 대신 StackPanel로 차례대로 쌓기 -->
+        <GroupBox Grid.Column="1" Header="도서 정보 입력" Height="380" VerticalAlignment="Top" Margin="10,10,10,0">
+            <StackPanel Orientation="Vertical">
+                <!-- 각 컨트롤마다 일정한 Margin을 주어 간격을 고정 -->
+                <mah:NumericUpDown x:Name="NudBookId" Minimum="0" IsReadOnly="True" Margin="0,4"
+                                   mah:TextBoxHelper.AutoWatermark="True" 
+                                   mah:TextBoxHelper.Watermark="순번" 
+                                   mah:TextBoxHelper.UseFloatingWatermark="True"/>
+
+                <TextBox x:Name="TxtAuthor" Margin="0,4"
+                 mah:TextBoxHelper.AutoWatermark="True" 
+                         mah:TextBoxHelper.Watermark="저자" 
+                         mah:TextBoxHelper.UseFloatingWatermark="True"/>
+
+                <ComboBox x:Name="CboDivCode" Margin="0,4" 
+                          mah:TextBoxHelper.Watermark="장르 선택" 
+                          mah:TextBoxHelper.UseFloatingWatermark="True"/>
+
+                <TextBox x:Name="TxtBookName" Margin="0,4" 
+                         mah:TextBoxHelper.Watermark="책이름" 
+                         mah:TextBoxHelper.UseFloatingWatermark="True"/>
+
+                <DatePicker x:Name="DtpReleaseDt" Margin="0,4"/>
+
+                <TextBox x:Name="TxtIsbn" Margin="0,4" 
+                         mah:TextBoxHelper.Watermark="ISBN" 
+                         mah:TextBoxHelper.UseFloatingWatermark="True"/>
+
+                <TextBox x:Name="TxtPrice" Margin="0,4" 
+                         mah:TextBoxHelper.Watermark="책가격" 
+                         mah:TextBoxHelper.UseFloatingWatermark="True"/>
+
+                <!-- 버튼 영역 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,40,0,0">
+                    <Button x:Name="BtnNew" Content="신규" Margin="5,0" MinWidth="60"
+                            Style="{StaticResource MahApps.Styles.Button.Dialogs.AccentHighlight}"
+                            />
+                    <Button x:Name="BtnSave" Content="저장"  Margin="5,0"  MinWidth="60"
+                            Style="{StaticResource MahApps.Styles.Button.Dialogs.AccentHighlight}"/>
+                    <Button x:Name="BtnDelete"  Content="삭제"  Margin="5,0"  MinWidth="60"
+                            Style="{StaticResource MahApps.Styles.Button.Dialogs.AccentHighlight}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <StatusBar x:Name="StbWindow" Grid.Row="1" Grid.ColumnSpan="2"/>
+
+    </Grid>
+</mah:MetroWindow>
