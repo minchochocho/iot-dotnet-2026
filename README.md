@@ -814,27 +814,90 @@ namespace WpfBasic03UIApp {
 ![alt text](image-29.png)
 
 #### DB연동 객체 리스트
-- Connection
-- Command
-- DataAdapter
-- DataReader
-- DataTable
+- DataBase와 C# 간의 연동에 필요한 객체 및 변수
+    - ConnectionString  : DB연결 문자열. 종류마다 포맷과 키값이 다름
+    ```cs
+    // 포트 지정이 필요한 경우 (기본값: 3306)
+    // localhost : 127.0.0.1
+    Server=서버IP;Port=3306;Database=DB이름;Uid=유저명;Pwd=비밀번호;
+    // 또는
+    Server=서버IP;Database=DB이름;User id=유저명;Password=비밀번호;Charset=utf8;
+    ```
+    - query : 
 
-#### DB연동 마무리
+    - 각 DB별 외부패키지 NuGet에서 설치
+    - Connection : DB연결객체, MySQLConnection, Connection 앞 Prefix만 다름
 
-- 데이터그리드 클릭 상세
-- 저장, 수정, 삭제 기능
+    - Command : 쿼리를 컨트롤 객체, MySqlCommand. 생성시 쿼리문, Connection객체 필요
+        - ExcuteNonQuery() : INSERT, UPDATE, DELETE 명령 실행
+        - ExcuteReader() : SELECT문 실행, 데이터읽어오고 반복문으로 직접 제어
+        - ExcuteScalar() : COUNT 함수 처럼 1개 값만 리턴되는 쿼리 실행
+    - `DataAdapter` : Command 객체를 자동으로 반복문 처리해주는 객체
+        - ExcutReader()로 생성된 결과는 수동으로 반복문 처리
+        - 각 데이터별 조작이 필요할 때 불편함
+    - `DataReader` : ExcuteREader()로 생성된 결과를 담는 객체
+    - 여기까지 Sql, MySQL, Oracle 등 DB종류별로 Prefix가 붙음
+    - DataTable : DataAdapter로 생성된 데이터를 담는 공통 객체
+
+#### 콤보박스 바인딩
+![alt text](image-30.png)
+
+```xml
+<ComboBox x:Name="CboDivCode" Margin="0,4" 
+          SelectedValuePath="div_code"
+          DisplayMemberPath="div_name"
+```
+![alt text](image-31.png)
+
+#### 입력값 검증
+- 실무에서 DB에 데이터입력 전에 가장 중요한 부분
+- 입력값 검증을 제대로 해야 DB에 잘못된 데이터가 저장되지 않음
+```cs
+ if (string.IsNullOrEmpty(author) || string.IsNullOrEmpty(bookName) || string.IsNullOrEmpty(divCode))
+ {
+     await this.ShowMessageAsync("입력오류", "필수값을 입력하세요");
+     return;
+ }
+
+ // TryParse(가져올값 변수, out 담을변수) 메서드
+ if (!DateTime.TryParse(DtpReleaseDt.Text, out DateTime releseDt))    // 잘처리하면 True, 실패하면 False 우린 실패할때를 봐야 하니깐 !붙이기
+ {
+     await this.ShowMessageAsync("입력오류", "날짜형식이 올바르지 않습니다.");
+ }
+
+ // 가격도 TryParse
+ if (!int.TryParse(TxtPrice.Text, out int price))
+ {
+     await this.ShowMessageAsync("입력오류", "가격은 숫자로 입력하세요.");
+ }
+```
+
+- 실행화면
+![alt text](image-32.png)
+
+- [xaml](./winapp/WpfBasic01App/WpfBasic04DbApp/MainWindow.xaml)
+- [소스](./winapp/WpfBasic01App/WpfBasic04DbApp/MainWindow.xaml.cs)
+
+## 데스크탑앱 강의 진행사항
 
 ### 리소스 디자인 추가
+#### Presenter (나중에)
+- 컨트롤의 실제 내용을 화면에 표시하는 자리
 
+### 키오스크 앱
+- 결재이전까지 동작하는 버전
+- WPF를 사용해서 구현
 
 ### OpenAPI연동 앱
 - 미세먼지 모니터링앱
 - 국가교통정보 CCTV뷰 앱
 - IoT 모니터링앱
 
-### 키오스크 앱
-- 결제이전까지 동작하는 버전
-- WPF를 사용해서 구현
+### 스마트홈 앱
+- ??
 
 ### 라이브러리 만들기
+
+### Exxential Pathway 학습
+
+### 게임 프로젝트
