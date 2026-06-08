@@ -60,6 +60,6 @@ OrderItem - 주문리스트 저장
 ![alt text](image-35.png)
 
 #### 기본 동작 이벤트 구현
-
+![](./기본_동작_이벤트_구현.gif)
 
 ### OpenAPI 연동앱 개발
