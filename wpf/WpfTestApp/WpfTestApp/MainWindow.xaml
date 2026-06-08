@@ -5,7 +5,7 @@
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
     Title="TeamPlay Mate"
-    Width="1200"
+    Width="1300"
     Height="800"
     MinWidth="1100"
     MinHeight="700"
@@ -338,23 +338,26 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Today}"
+                                   FontSize="11"
+                                   Foreground="#9CA3AF"
+                                   Margin="0,0,0,4"/>
                         <TextBlock Text="대시보드"
-                                   FontSize="28"
+                                   FontSize="26"
                                    FontWeight="Bold"
-                                   Foreground="#111827"
-                                   LineHeight="36"/>
+                                   Foreground="#111827"/>
                         <TextBlock Text="프로젝트와 작업의 진행 상황을 한눈에 확인하세요"
                                    FontSize="13"
                                    Foreground="#9CA3AF"
-                                   Margin="0,6,0,0"/>
+                                   Margin="0,5,0,0"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
                         <Button Style="{StaticResource ButtonCustom}"
-                                Height="40"
-                                Padding="18,0"
+                                Height="38"
+                                Padding="16,0"
                                 Margin="0,0,10,0"
                                 Background="White"
                                 BorderBrush="#E5E7EB"
@@ -362,68 +365,96 @@
                                 Content="상세 보고서"
                                 Click="DetailReport_Click"/>
                         <Button Style="{StaticResource ButtonPrimary}"
-                                Height="40"
-                                Padding="18,0"
+                                Height="38"
+                                Padding="16,0"
                                 Content="+ 새 프로젝트"
                                 Click="NewProject_Click"/>
                     </StackPanel>
                 </Grid>
 
                 <!-- Summary cards -->
-                <UniformGrid Columns="4" Margin="0,0,0,24">
-                    <hc:Card Margin="0,0,10,0"
-                             BorderThickness="0"
-                             Effect="{DynamicResource EffectShadow2}">
-                        <StackPanel HorizontalAlignment="Center" Margin="0,20,0,20">
-                            <TextBlock Text="{Binding SummaryCards[0].Value}"
-                                       FontSize="36" FontWeight="Bold"
-                                       HorizontalAlignment="Center"
-                                       Foreground="{Binding SummaryCards[0].Color, Converter={StaticResource HexToBrushConverter}}"/>
-                            <TextBlock Text="{Binding SummaryCards[0].Label}"
-                                       FontSize="13" Foreground="#6B7280"
-                                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
-                        </StackPanel>
-                    </hc:Card>
-                    <hc:Card Margin="0,0,10,0"
-                             BorderThickness="0"
-                             Effect="{DynamicResource EffectShadow2}">
-                        <StackPanel HorizontalAlignment="Center" Margin="0,20,0,20">
-                            <TextBlock Text="{Binding SummaryCards[1].Value}"
-                                       FontSize="36" FontWeight="Bold"
-                                       HorizontalAlignment="Center"
-                                       Foreground="{Binding SummaryCards[1].Color, Converter={StaticResource HexToBrushConverter}}"/>
-                            <TextBlock Text="{Binding SummaryCards[1].Label}"
-                                       FontSize="13" Foreground="#6B7280"
-                                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
-                        </StackPanel>
-                    </hc:Card>
-                    <hc:Card Margin="0,0,10,0"
-                             BorderThickness="0"
-                             Effect="{DynamicResource EffectShadow2}">
-                        <StackPanel HorizontalAlignment="Center" Margin="0,20,0,20">
-                            <TextBlock Text="{Binding SummaryCards[2].Value}"
-                                       FontSize="36" FontWeight="Bold"
-                                       HorizontalAlignment="Center"
-                                       Foreground="{Binding SummaryCards[2].Color, Converter={StaticResource HexToBrushConverter}}"/>
-                            <TextBlock Text="{Binding SummaryCards[2].Label}"
-                                       FontSize="13" Foreground="#6B7280"
-                                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
-                        </StackPanel>
-                    </hc:Card>
-                    <hc:Card Margin="0"
-                             BorderThickness="0"
-                             Effect="{DynamicResource EffectShadow2}">
-                        <StackPanel HorizontalAlignment="Center" Margin="0,20,0,20">
-                            <TextBlock Text="{Binding SummaryCards[3].Value}"
-                                       FontSize="36" FontWeight="Bold"
-                                       HorizontalAlignment="Center"
-                                       Foreground="{Binding SummaryCards[3].Color, Converter={StaticResource HexToBrushConverter}}"/>
-                            <TextBlock Text="{Binding SummaryCards[3].Label}"
-                                       FontSize="13" Foreground="#6B7280"
-                                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
-                        </StackPanel>
-                    </hc:Card>
-                </UniformGrid>
+                <ItemsControl ItemsSource="{Binding SummaryCards}"
+                              Margin="0,0,-12,24">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <hc:Card Margin="0,0,12,0"
+                                     Padding="0"
+                                     BorderThickness="0"
+                                     Cursor="Hand"
+                                     Effect="{DynamicResource EffectShadow2}">
+                                <hc:Card.RenderTransform>
+                                    <TranslateTransform x:Name="CardMove"/>
+                                </hc:Card.RenderTransform>
+                                <hc:Card.Triggers>
+                                    <EventTrigger RoutedEvent="UIElement.MouseEnter">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="CardMove"
+                                                                 Storyboard.TargetProperty="Y"
+                                                                 To="-6" Duration="0:0:0.18">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <SineEase EasingMode="EaseOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                    <EventTrigger RoutedEvent="UIElement.MouseLeave">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="CardMove"
+                                                                 Storyboard.TargetProperty="Y"
+                                                                 To="0" Duration="0:0:0.18">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <SineEase EasingMode="EaseOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </hc:Card.Triggers>
+
+                                <Grid>
+                                    <!-- 상단 컬러 바 -->
+                                    <Border Height="4" VerticalAlignment="Top" CornerRadius="4,4,0,0"
+                                            Background="{Binding Color, Converter={StaticResource HexToBrushConverter}}"/>
+
+                                    <StackPanel Margin="16,18,16,20"
+                                                HorizontalAlignment="Center">
+                                        <!-- 숫자 (크게, 가운데) -->
+                                        <TextBlock Text="{Binding Value}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="{Binding Color, Converter={StaticResource HexToBrushConverter}}"/>
+
+                                        <!-- 아이콘 + 레이블 한 줄 (가운데 정렬) -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,8,0,0">
+                                            <TextBlock Text="{Binding Icon}"
+                                                       FontFamily="Segoe MDL2 Assets"
+                                                       FontSize="14"
+                                                       TextOptions.TextFormattingMode="Ideal"
+                                                       Foreground="{Binding Color, Converter={StaticResource HexToBrushConverter}}"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Label}"
+                                                       FontSize="13"
+                                                       Foreground="#6B7280"
+                                                       Margin="6,0,0,0"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </hc:Card>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <!-- Chart + Activity -->
                 <Grid>
@@ -480,21 +511,57 @@
                             <ItemsControl ItemsSource="{Binding RecentActivities}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border BorderBrush="#F3F4F6"
-                                                BorderThickness="0,0,0,1"
-                                                Padding="0,14">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Description}"
-                                                           FontSize="12"
-                                                           Foreground="#374151"
-                                                           TextWrapping="Wrap"
-                                                           LineHeight="18"/>
-                                                <TextBlock Text="{Binding TimeAgo}"
-                                                           FontSize="11"
-                                                           Foreground="#9CA3AF"
-                                                           Margin="0,6,0,0"/>
-                                            </StackPanel>
-                                        </Border>
+                                        <Grid Margin="0,0,0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="28"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- 타임라인 선 + 점 -->
+                                            <Grid>
+                                                <!-- 세로 연결선 -->
+                                                <Rectangle Width="2"
+                                                           Fill="#E5E7EB"
+                                                           HorizontalAlignment="Center"
+                                                           Margin="0,14,0,-4"/>
+                                                <!-- 색상 점 -->
+                                                <Ellipse Width="12" Height="12"
+                                                         VerticalAlignment="Top"
+                                                         HorizontalAlignment="Center"
+                                                         Margin="0,6,0,0"
+                                                         Fill="{Binding StatusColor, Converter={StaticResource HexToBrushConverter}}"/>
+                                            </Grid>
+
+                                            <!-- 내용 + 뱃지 -->
+                                            <Grid Grid.Column="1" Margin="4,0,0,16">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Description}"
+                                                               FontSize="12"
+                                                               Foreground="#374151"
+                                                               TextWrapping="Wrap"
+                                                               LineHeight="18"/>
+                                                    <TextBlock Text="{Binding TimeAgo}"
+                                                               FontSize="11"
+                                                               Foreground="#9CA3AF"
+                                                               Margin="0,4,0,0"/>
+                                                </StackPanel>
+                                                <Border Grid.Column="1"
+                                                        CornerRadius="10"
+                                                        Padding="8,3"
+                                                        Margin="8,0,0,0"
+                                                        VerticalAlignment="Top"
+                                                        Background="{Binding StatusBgColor, Converter={StaticResource HexToBrushConverter}}">
+                                                    <TextBlock Text="{Binding Status}"
+                                                               FontSize="10"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{Binding StatusTextColor, Converter={StaticResource HexToBrushConverter}}"/>
+                                                </Border>
+                                            </Grid>
+                                        </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
