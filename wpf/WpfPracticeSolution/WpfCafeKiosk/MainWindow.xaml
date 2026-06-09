@@ -10,203 +10,221 @@
         Title="Cafe KIOSK" Height="800" Width="600"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        Background="#EEEEEE">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="200"/>
-        </Grid.RowDefinitions>
+        Background="#EEEEEE" Loaded="Window_Loaded">
 
-        <!-- 상단헤더 -->
-        <Grid Background="#7D9950">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="80"/>
-            </Grid.ColumnDefinitions>
+    <materialDesign:DialogHost x:Name="RootDialog" CloseOnClickAway="True">
+        <materialDesign:DialogHost.DialogContent>
+            <materialDesign:Card Width="280" Padding="25" UniformCornerRadius="6">
+                <StackPanel>
+                    <TextBlock Text="장바구니를 비우시겠습니까?" FontSize="16" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,20"/>
+                    <Button x:Name="BtnOk"  Content="확인" HorizontalAlignment="Center" Background="#7D9950" Foreground="White" BorderThickness="0" 
+                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" FontWeight="Bold" Click="BtnOk_Click"/>
+                </StackPanel>
+            </materialDesign:Card>
+        </materialDesign:DialogHost.DialogContent>
+        
+        <!-- 키오스크 메인윈도우 기본화면 -->
+        <Grid >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="200"/>
+            </Grid.RowDefinitions>
 
-            <Button Grid.Column="0" Width="50" Height="50" Padding="0"
+            <!-- 상단헤더 -->
+            <Grid Background="#7D9950">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Width="50" Height="50" Padding="0" Click="btnHome_Click"
                     Style="{StaticResource MaterialDesignFlatButton}">
-                <Button.Content>
-                    <iconPacks:PackIconBootstrapIcons Kind="HouseFill" Foreground="White" VerticalAlignment="Center" Height="30" Width="30" />
-                </Button.Content>
-            </Button>
-            <Label Grid.Column="1" Content="CAFE KIOSK" 
+                    <Button.Content>
+                        <iconPacks:PackIconBootstrapIcons Kind="HouseFill" Foreground="White" VerticalAlignment="Center" Height="30" Width="30" />
+                    </Button.Content>
+                </Button>
+                <Label Grid.Column="1" Content="CAFE KIOSK" 
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    FontSize="30" FontWeight="ExtraBold"
                    Foreground="White">
 
-            </Label>
-            <Button Grid.Column="2" Width="50" Height="50" Padding="0"
+                </Label>
+                <Button Grid.Column="2" Width="50" Height="50" Padding="0"
                      Style="{StaticResource MaterialDesignFlatButton}">
-                <Button.Content>
-                    <iconPacks:PackIconBootstrapIcons Kind="PlusCircleFill" Foreground="White" VerticalAlignment="Center" Height="30" Width="30" />
-                </Button.Content>
-            </Button>
+                    <Button.Content>
+                        <iconPacks:PackIconBootstrapIcons Kind="PlusCircleFill" Foreground="White" VerticalAlignment="Center" Height="30" Width="30" />
+                    </Button.Content>
+                </Button>
 
 
-        </Grid>
+            </Grid>
 
 
-        <!-- 카테고리 탭 -->
-        <Grid Grid.Row="1">
-            <TabControl Width="600"
+            <!-- 카테고리 탭 -->
+            <Grid Grid.Row="1" >
+                <TabControl Width="600"
                         materialDesign:ColorZoneAssist.Background="#7D9950"
                         materialDesign:ColorZoneAssist.Foreground="White"
                         materialDesign:ColorZoneAssist.Mode="Custom"
-                        Style="{StaticResource MaterialDesignFilledTabControl}">      
-                <TabItem Header="시즌메뉴" FontWeight="Bold">
-                    <UniformGrid Margin="10" Columns="3" Rows="2">
-                        <!-- 버튼 디자인 완료본 -->
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click"
+                        Style="{StaticResource MaterialDesignFilledTabControl}">
+                    <TabItem x:Name="TabAll" Header="시즌메뉴" FontWeight="Bold">
+                        <UniformGrid Margin="10" Columns="3" Rows="2" x:Name="MenuPanel">
+                            <!-- 버튼 디자인 완료본 -->
+                            <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click"
                                 Margin="5" Padding="0" Background="White" materialDesign:ButtonAssist.CornerRadius="5"
                                 Tag="아메리카노|3000|/images/americano.png">
-                            <materialDesign:Card UniformCornerRadius="2" Padding="0">
-                                <Grid>
-                                    <Image Source="/images/americano.png" Stretch="Fill"  />
-                                    <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
-                                    <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
-                                        <TextBlock Text="아메리카노" FontSize="14" TextAlignment="Center" FontWeight="Bold" Foreground="DimGray"/>
-                                        <TextBlock Text="3,000원" FontSize="12" TextAlignment="Center"  FontWeight="Heavy" Foreground="ForestGreen"/>
-                                    </StackPanel>
-                                </Grid>
-                            </materialDesign:Card>
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180"  Click="Menu_Click"
-                                Margin="5" Padding="0" Background="White" materialDesign:ButtonAssist.CornerRadius="5"
-                                Tag="카페라떼|4000|/images/latte.png">
-                            <materialDesign:Card UniformCornerRadius="2" Padding="0">
-                                <Grid>
-                                    <Image Source="/images/latte.png" Stretch="Fill"  />
-                                    <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
-                                    <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
-                                        <TextBlock Text="카페라떼" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
-                                        <TextBlock Text="4,000원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
-                                    </StackPanel>
-                                </Grid>
-                            </materialDesign:Card>
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click" 
+                                <materialDesign:Card UniformCornerRadius="2" Padding="0">
+                                    <Grid>
+                                        <Image Source="/images/americano.png" Stretch="Fill"  />
+                                        <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
+                                        <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
+                                            <TextBlock Text="아메리카노" FontSize="14" TextAlignment="Center" FontWeight="Bold" Foreground="DimGray"/>
+                                            <TextBlock Text="3,000원" FontSize="12" TextAlignment="Center"  FontWeight="Heavy" Foreground="ForestGreen"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click" 
                                 Margin="5" Padding="0" Background="White" materialDesign:ButtonAssist.CornerRadius="5"
                                 Tag="헤이즐넛라떼|4500|/images/hazelnut.png">
-                            <materialDesign:Card UniformCornerRadius="2" Padding="0">
-                                <Grid>
-                                    <Image Source="/images/hazelnut.png" Stretch="Fill"  />
-                                    <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
-                                    <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
-                                        <TextBlock Text="헤이즐넛 라떼" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
-                                        <TextBlock Text="4,500원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
-                                    </StackPanel>
-                                </Grid>
-                            </materialDesign:Card>
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click"
+                                <materialDesign:Card UniformCornerRadius="2" Padding="0">
+                                    <Grid>
+                                        <Image Source="/images/hazelnut.png" Stretch="Fill"  />
+                                        <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
+                                        <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
+                                            <TextBlock Text="헤이즐넛 라떼" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
+                                            <TextBlock Text="4,500원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180"  Click="Menu_Click"
+                                Margin="5" Padding="0" Background="White" materialDesign:ButtonAssist.CornerRadius="5"
+                                Tag="카페라떼|4000|/images/latte.png">
+                                <materialDesign:Card UniformCornerRadius="2" Padding="0">
+                                    <Grid>
+                                        <Image Source="/images/latte.png" Stretch="Fill"  />
+                                        <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
+                                        <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
+                                            <TextBlock Text="카페라떼" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
+                                            <TextBlock Text="4,000원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click"
                                 Margin="5" Padding="0" Background="White" materialDesign:ButtonAssist.CornerRadius="5"
                                 Tag="아이스아메리카노|3500|/images/iceamericano.png">
-                            <materialDesign:Card UniformCornerRadius="2" Padding="0">
-                                <Grid>
-                                    <Image Source="/images/iceamericano.png" Stretch="Fill"  />
-                                    <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
-                                    <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
-                                        <TextBlock Text="아이스 아메리카노" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
-                                        <TextBlock Text="3,500원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
-                                    </StackPanel>
-                                </Grid>
-                            </materialDesign:Card>
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click"
+                                <materialDesign:Card UniformCornerRadius="2" Padding="0">
+                                    <Grid>
+                                        <Image Source="/images/iceamericano.png" Stretch="Fill"  />
+                                        <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
+                                        <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
+                                            <TextBlock Text="아이스 아메리카노" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
+                                            <TextBlock Text="3,500원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFlatButton}" Height="180" Click="Menu_Click"
                                 Margin="5" Padding="0" Background="White" materialDesign:ButtonAssist.CornerRadius="5"
                                 Tag="망고주스|3500|/images/mango.png">
-                            <materialDesign:Card UniformCornerRadius="2" Padding="0">
-                                <Grid>
-                                    <Image Source="/images/mango.png" Stretch="Fill"  />
-                                    <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
-                                    <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
-                                        <TextBlock Text="망고주스" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
-                                        <TextBlock Text="3,500원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
-                                    </StackPanel>
-                                </Grid>
-                            </materialDesign:Card>
-                        </Button>
-                    </UniformGrid>
-                </TabItem>
-                <TabItem Header="HOT">
-                    <TextBlock Margin="8" Text="Custom Tab 2" />
-                </TabItem>
-                <TabItem Header="ICE">
-                    <TextBlock Margin="8" Text="Custom Tab 2" />
-                </TabItem>
-            </TabControl>
-        </Grid>
-        <!-- 하단 주문리스트 및 결제영역 -->
-        <Grid Grid.Row="2" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="200"/>
-            </Grid.ColumnDefinitions>
-            
-            <!-- 왼쪽 주문리스트 영역 -->
-            <Border Grid.Column="0" Background="White" CornerRadius="6" Margin="0,0,5,0" Padding="8">
-                <ListBox BorderThickness="0" Background="Transparent" FontSize="14">
-                    <!-- 임시 디자인용 데이터 -->
-                    <ListBoxItem HorizontalContentAlignment="Stretch">
-                        <Grid Height="35" >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="30" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="70" />
-                            </Grid.ColumnDefinitions>
-
-                            <Button Grid.Column="0" Width="20" Height="20" Padding="0"
-                                    Background="Transparent" BorderThickness="0"
-                                    >
-                                <iconPacks:PackIconMaterialDesign Kind="RemoveCircleSharp" />
+                                <materialDesign:Card UniformCornerRadius="2" Padding="0">
+                                    <Grid>
+                                        <Image Source="/images/mango.png" Stretch="Fill"  />
+                                        <Border Background="#CCFFFFFF" VerticalAlignment="Bottom" Height="43"></Border>
+                                        <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,5">
+                                            <TextBlock Text="망고주스" FontSize="14" TextAlignment="Center" Foreground="DimGray"/>
+                                            <TextBlock Text="3,500원" FontSize="12" TextAlignment="Center"  Foreground="ForestGreen"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </materialDesign:Card>
                             </Button>
-
-                            <TextBlock Grid.Column="1" Text="아메리카노" VerticalAlignment="Center" FontWeight="Bold" Foreground="DimGray"></TextBlock>
-                            <TextBlock Grid.Column="2" Text="3,000원" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#7D9950"></TextBlock>
-                        </Grid>
-                    </ListBoxItem>
-                </ListBox>
-            </Border>
-            <!-- 오른쪽 버튼 영역 -->
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                        </UniformGrid>
+                    </TabItem>
+                    <TabItem x:Name="TabHot" Header="HOT">
+                        <TextBlock Margin="8" Text="Custom Tab 2" />
+                    </TabItem>
+                    <TabItem x:Name="TabIce" Header="ICE">
+                        <TextBlock Margin="8" Text="Custom Tab 2" />
+                    </TabItem>
+                </TabControl>
+            </Grid>
+            <!-- 하단 주문리스트 및 결제영역 -->
+            <Grid Grid.Row="2" Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="200"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="남은시간" FontSize="20" FontWeight="Bold" TextAlignment="Center"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="59" FontSize="24" FontWeight="Bold" Foreground="#7D9950"/>
-                        <TextBlock Text="초" FontSize="18" FontWeight="Bold" VerticalAlignment="Bottom" Margin="0,0,0,1"/>
-                    </StackPanel>
-                </StackPanel>
 
-                <Button Grid.Column="1" Content="전체 삭제" Padding="0" 
+                <!-- 왼쪽 주문리스트 영역 -->
+                <Border Grid.Column="0" Background="White" CornerRadius="6" Margin="0,0,5,0" Padding="8">
+                    <ListBox x:Name="LstOrder" BorderThickness="0" Background="Transparent" FontSize="14" HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="35" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="70" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Column="0" Width="20" Height="20" Padding="0"
+                                        Background="Transparent" BorderThickness="0"
+                                        Click="BtnRemoveOrder_Click" Tag="{Binding}">
+                                        <iconPacks:PackIconMaterialDesign Kind="RemoveCircleSharp" />
+                                    </Button>
+
+                                    <TextBlock Grid.Column="1" Text="{Binding MenuName}" VerticalAlignment="Center" FontWeight="Bold" Foreground="DimGray"></TextBlock>
+                                    <TextBlock Grid.Column="2" Text="{Binding Count, StringFormat={}{0:N0}}" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#7D9950"></TextBlock>
+                                    <TextBlock Grid.Column="3" Text="{Binding TotalPrice, StringFormat={}{0:N0}원}" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#7D9950"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+                <!-- 오른쪽 버튼 영역 -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="남은시간" FontSize="20" FontWeight="Bold" TextAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock x:Name="TxtRemainTime" Text="00" FontSize="24" FontWeight="Bold" Foreground="#7D9950"/>
+                            <TextBlock Text="초" FontSize="18" FontWeight="Bold" VerticalAlignment="Bottom" Margin="0,0,0,1"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Content="전체 삭제" Padding="0" Click="BtnClearAll_Click"
                         Style="{StaticResource MaterialDesignFlatSecondaryDarkBgButton}" Background="#5d5353" 
                         FontWeight="Bold" BorderThickness="0" Height="50" />
-                <Border Grid.Row="1" Grid.ColumnSpan="2" Background="White" CornerRadius="6" Margin="0,2,0,2" >
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="선택한 상품" Margin="20, 10" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold"></TextBlock>
-                        <TextBlock Text="1개" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="18" FontWeight="Bold"
+                    <Border Grid.Row="1" Grid.ColumnSpan="2" Background="White" CornerRadius="6" Margin="0,2,0,2" >
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="선택한 상품" Margin="20, 10" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold"></TextBlock>
+                            <TextBlock x:Name="TxtOrderCount" Text="0개" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="18" FontWeight="Bold"
                                Foreground="#7D9950"/>
-                    </StackPanel>
-                </Border>
+                        </StackPanel>
+                    </Border>
 
-                <Button Grid.Row="2" Grid.ColumnSpan="2" Height="50" Background="#7D9950" Foreground="White" BorderThickness="0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="3,000원" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="결제" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2" />
-                    </StackPanel>
-                </Button>
+                    <Button x:Name="BtnPay" Grid.Row="2" Grid.ColumnSpan="2" Height="50" Background="#7D9950" Foreground="White" BorderThickness="0" Click="BtnPay_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="TxtTotalPrice" Text="0원" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="결제"  FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
             </Grid>
         </Grid>
-    </Grid>
+
+    </materialDesign:DialogHost>
 </Window>

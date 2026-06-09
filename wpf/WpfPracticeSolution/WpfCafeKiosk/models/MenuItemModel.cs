@@ -1,5 +1,5 @@
 ﻿namespace WpfCafeKiosk.models {
-    public class Menuitem {
+    public class MenuItemModel {
         // menu_id, menu_name, price, image_path, category, is_sale DB 컬럼명
         // MenuId, MenuName, Price, ImagePath, Category, IsSale 클래스 속성명
         public int MenuId { get; set; }
