@@ -39,7 +39,8 @@ namespace WpfCafeKiosk {
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-
+            DialogResult = true;
+            Close();
         }
     }
 }

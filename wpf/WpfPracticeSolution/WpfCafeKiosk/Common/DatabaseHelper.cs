@@ -10,6 +10,7 @@ namespace WpfCafeKiosk.Common {
                                  "User ID=root;" +      // 운영DB 사용자로 변경
                                  "Password=my123456;" + // 패스워드 변경할 것
                                  "Charset=utf8mb4;";
+        // DB조회 메서드
         public DataTable Select(string sql)
         {
             using MySqlConnection conn = new MySqlConnection(connStr);
@@ -22,6 +23,33 @@ namespace WpfCafeKiosk.Common {
             adapter.Fill(dt);
 
             return dt;
+        }
+
+        // DB실행 메서드(실행결과 리턴)
+        // INSERT, UPDATE, DELETE
+        public int ExecuteScalar(string sql)
+        {
+            using MySqlConnection conn = new MySqlConnection(connStr);
+            conn.Open();  // DB 오픈
+
+            using MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+            // 1건 INSERT하면 1리턴, 2건 삭제하면 2리턴, count(*) 카운트개수 리턴 등 결과건수를 확인
+            // 결과를 하나만 받을때 보통 사용
+            return Convert.ToInt32(cmd.ExecuteScalar());
+
+        }
+        // DB실행 메서드(실행결과 리턴X)
+        // INSERT, UPDATE, DELETE
+        public void ExecuteNonQuery(string sql)
+        {
+            using MySqlConnection conn = new MySqlConnection(connStr);
+            conn.Open();  // DB 오픈
+
+            using MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+            cmd.ExecuteNonQuery();   // 결과 안보고 실행가능, 건수리턴도 가능
+
         }
     }
 }

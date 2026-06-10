@@ -25,6 +25,7 @@ namespace WpfCafeKiosk {
         private DatabaseHelper db;
         public MainWindow()
         {
+            Console.WriteLine("카페키오스크 앱 시작!");
             InitializeComponent();
         }
 
@@ -64,6 +65,7 @@ namespace WpfCafeKiosk {
             {
                 DataTable dt = db.Select(query);
                 // MessageBox.Show(dt.Rows.Count.ToString());
+                Console.WriteLine($"DB 메뉴 {dt.Rows.Count}개 로딩확인");
                 foreach (DataRow row in dt.Rows)
                 {
                     MenuItemModel MenuItem = new MenuItemModel
@@ -78,6 +80,7 @@ namespace WpfCafeKiosk {
                     MenuPanel.Children.Add(btn);
                 }
 
+                Console.WriteLine("DB 메뉴 로딩완료!");
             }
             catch (Exception ex)
             {
@@ -208,7 +211,7 @@ namespace WpfCafeKiosk {
             string strTag = btn.Tag.ToString();
 
             // MessageBox.Show($"{price}, {name}");
-
+            Console.WriteLine($"{strTag}메뉴 클릭");
             MenuOptionWindow win = new MenuOptionWindow(strTag);
 
             win.Owner = this;   // MainWindow가 MenuOptionWindow의 부모
@@ -222,10 +225,11 @@ namespace WpfCafeKiosk {
 
                 // 주문 리스트뷰에 추가
                 // MessageBox.Show($"{item.MenuName} {item.Count}개 담기! {item.TotalPrice:N0}원");
+                Console.WriteLine($"{win.SelectedOrder.MenuName} {win.SelectedOrder.Count}개 담기! {win.SelectedOrder.TotalPrice:N0}원");
                 orders.Add(win.SelectedOrder);
+                RefreshOrderSummary();
+                remainSeconds = 60;
             }
-            RefreshOrderSummary();
-            remainSeconds = 60;
         }
 
         // xaml에서 F12클릭시 자동 생성
@@ -278,11 +282,63 @@ namespace WpfCafeKiosk {
             RefreshOrderSummary();
         }
 
+        // 주문, 주문상세 DB 저장메서드
+        private void SaveOrders()
+        {
+            int totalCount = orders.Sum(x => x.Count);   // Lambda 함수
+            int totalAmount = orders.Sum(x => x.TotalPrice);
+
+            string orderQuery = $@"INSERT INTO orders
+                                (
+                                    total_count,
+                                    total_amount
+                                )
+                                VALUES
+                                (
+                                    {totalCount},
+                                    {totalAmount}
+                                );
+
+                                SELECT LAST_INSERT_ID();";
+
+            int orderID = db.ExecuteScalar(orderQuery);
+
+
+            // order_detail 테이블에 주문상세 INSERT
+            foreach (OrderItem item in orders)
+            {
+                string orderDetailQuery = $@"INSERT INTO order_detail
+                                            (
+                                               order_id, 
+                                               menu_id, 
+                                               menu_name, 
+                                               price, 
+                                               count, 
+                                               total_price
+                                            )
+                                            VALUES
+                                            (   
+                                               {orderID}, 
+                                               {item.MenuId}, 
+                                               '{item.MenuName}', 
+                                               {item.Price}, 
+                                               {item.Count}, 
+                                               {item.TotalPrice}
+                                            )";
+                db.ExecuteNonQuery(orderDetailQuery);
+            }
+
+        }
+
         // 결제버튼
         private void BtnPay_Click(object sender, RoutedEventArgs e)
         {
+
             if (orders.Count == 0) return;
 
+            remainSeconds = 60;
+            TxtRemainTime.Text = remainSeconds.ToString();
+            timer.Stop();
             OrderConfirmWindow win = new OrderConfirmWindow(orders);
             win.Owner = this;   // 결제창의 소유자(부모)는 MainWindow다
 
@@ -290,11 +346,16 @@ namespace WpfCafeKiosk {
 
             if (result == true)
             {
-                //
+                // DB저장
+                SaveOrders();
+                Console.WriteLine("주문 DB저장 완료");
+
+                // TODO : 카드결제창 팝업 
             }
             else
             {
                 timer.Start();
+                Console.WriteLine("주문 DB저장 실패");
             }
 
         }
