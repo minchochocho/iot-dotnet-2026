@@ -267,16 +267,295 @@ OrderItem - 주문리스트 저장
 
 #### 추가 작업
 
-- [ ] NLog로 로그처리
-- [ ] MahApps.Metro.IconPacks 사용
+- [x] NLog로 로그처리
+- [x] MahApps.Metro.IconPacks 사용
+- [x] 페이지번호, 결과수 파라미터 사용하기\
+- [x] 데이터그리드 포커스 색상 반전
+- [x] 기타 예외처리
+- [x] 데이터그리드 레코드 더블클릭시 상세정보 및 지도 팝업
+- [x] 상세정보 상세내용 HTML 태그 삭제
+- [x] 상태 표시줄 
+- [x] 상세정보 홈페이지 띄우기
 - [ ] 비동기 메서드 수정
-- [ ] 페이지번호, 결과수 파라미터 사용하기
-- [ ] 검색버튼 기능
-- [ ] 데이터그리드 포커스 색상 반전
-- [ ] 데이터그리드 레코드 클릭시 상세 팝업
-- [ ] 데이터그리드 레코드 더블클릭시 지도 팝업
-- [ ] 기타 예외처리
+
+
+#### C# 코딩방식 변경
+- 좀더 효율적인 코딩방식 채택
+```cs
+// 1번 예전 C#방식
+if (response != null &&  
+    response.FestivalData != null &&
+    response.FestivalData.Items != null)
+{
+    return response.FestivalData.Items;
+} 
+else
+{
+    return new ObservableCollection<FestivalItem>(); // 빈 리스트
+}
+
+// 2번 좀더 최근 C#방식
+return response?.FestivalData?.Items?? new ObservableCollection<FestivalItem>();
+```
+
+- `?.` response가 null이면 null반환 아니면 reponse.FestivalDat로 진입
+- `??` 현재 객체가 null이면 ?? 다음의 개게로 반환
+
+
+#### NuGet 패키지
+
+- 느낌표 아이콘이 뜨면 패키지 사용이 거의 불가
+![alt text](image-49.png)
+
+#### NLog
+- .NET 앱용 로깅 라이브러리
+- 이전 log4j.net 자바라이브러리를 C#용으로 수정한 라이브러리 사용
+- MessageBox.shw(), Console.WriteLine() 디버깅 후에 주석처리 또는 삭제
+- 로그를 파일이나 DB에 저장하는 형태로 사용 가능
+
+##### NuGet 패키지에 설치
+
+##### NLog.config 설정
+- 프로젝트 최상위 폴더에서 xml 파일로 NLog.config 파일 생성
+- 아래와 같이 작성
+  ```xml
+  <?xml version="1.0" encoding="utf-8" ?>
+  <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.nlog-project.org/schemas/NLog.xsd NLog.xsd">
+
+      <targets>
+          <target name="logfile" xsi:type="File" fileName="logfile.txt" />
+          <target name="logconsole" xsi:type="Console" />
+      </targets>
+
+      <rules>
+          <logger name="*" minlevel="Info" writeTo="logconsole" />
+          <logger name="*" minlevel="Debug" writeTo="logfile" />
+      </rules>
+  </nlog>
+  ```
+
+##### NLog 사용법
+
+```cs
+// NLog 기본 객체 생성방법
+private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+logger.Info("부산 페스티벌 정보앱 시작");
+logger.Trace("트레이스");
+logger.Debus("디버그");
+logger.Warn("경고");
+logger.Error("예외발생");
+logger.Fatal("매우 중대한 오류");
+
+```
+
+- NLog.config 파일 속성 > `빌드 작업 : 내용(컨텐츠)`, `출력 디렉토리로 복사 : 항상 복사` 변경
+- 빌드
+
+![alt text](image-51.png)
+
+#### WinForms, WPF 기본 웹브라우저 컨트롤 문제
+
+- HTML렌더링 엔진이 최신 스크립트를 지원하지 않음
+
+![alt text](image-50.png)
+
+- CefSharfWPF 라이브러리 사용
+
+#### 추가 개발건
+- 난이도 하
+  - [ ] 결과수에서 값을 변경하고 엔터키를 누르면 바로 검색진행
+  - [ ] 전체 데이터수를 넘어서는 페이지 번호, 결과수 제약
+  - [ ] 웹사이트 링크대신 아이콘버튼으로 바꾸기
+  - [ ] MIDDLE_SIZE_RN1 장애인 정보 표현
+- 난이도 중
+  - [ ] HTML 삭제 대신 CefSharp.WPF 브라우저로 HTML 렌더링 표현
+- 난이도 상
+  - [ ] 유튜브 검색결과와 연동, 링크누르면 유튜브 실행하게
+  - [ ] 구글맵 API 사용해서 구글맵 표현
+
+
+#### 데이터 포털 활용방법
+- 축제정보와 거의 동일한 서비스
+  - 부산광역시_부산맛집정보 서비스
+  - 부산광역시_부산명소정보 서비스
+  - 부산광역시_부산테마여행정보 서비스
+  - 부산광역시_부산도보여행정보 서비스
+  - 부산광역시_부산쇼핑정보 서비스
+
+- 유사한 서비스
+  - 부산광역시_공연장 목록 서비스
+  - 부산광역시_갈맷길 코스 정보 서비스
+  - 부산광역시_구군 모범음식점 현황
+
+- 관광공사에서 API를 신규발급 서비스
+  - 부산 음식테마거리
+  - 부산 7beach 음식관광
+
+
+#### 완성 실행결과
 
 ### SmartHome 솔루션
 
+#### MQTT
+
+- Message Queuing Telemetry Transport 프로토콜 명칭
+- IoT 장치간에 데이터를 주고받을 수 있도록 개발
+- ISO/IEC 20922 국제 표준
+- 발행/구독(Publish-subsribe) 기반 - ROS와 유사
+  - Apache Kafka : Java, Spring Boot
+  - ROS2 DDS : 로봇
+  - MQTT : IoT, 스마트팩토리
+  - RabbitMQ : 기업메시징
+  - SignalR : 실시간 웹
+  - WebSocket 브로드캐스트 : 실시간웹
+- 소켓통신, TCP/IP 기반
+  - 일반적으로 `육상은 실시간 전송 가능(100ms ~ 1s)
+  - 육상과 해상을` 연결하는 위성통신 전송(1m ~ 5m)
+
+- MQTT 동작방식
+
+![alt text](image-52.png)
+
+- MQTT 시스템 구성도
+![alt text](image-54.png)
+
+#### WPF SmartHome 프로젝트
+
+- Dummy Sensing Data 생성, 송신 시뮬레이터 앱 구현
+- MQTT 브로커 설치 및 설정
+- SmartHome 모니터링 앱 구현
+
+- MQTT는 내 아이디 패스워드가 있는애들만 접속할 수 있게 할 수 있음 - 할지 안할지는 모르지만
+
+#### Dummy Simulator앱
+
+- Fake 데이터를 생성하는 앱
+- 직접 IoT디바이스를 사용하지 않고 테스트
+- 시스템 개발시 실제 데이터를 활용해서 개발
+- Bogus Package를 사용해서 가짜 데이터 생성
+
+##### 중간 실행결과
+- 현재 방 4개(침실, 욕실, 거실, 주방)을 Faker로 생성
+- 각 방별로 IoT장비(아두이노) + 온습도센서 + 무선통신 구성 필요
+- 라즈베리파이 등의 수집장비에서 데이터 수신받은후
+- json으로 변경해서 MQTT Broker로 전달
+
+![alt text](image-55.png)
+
+##### 추가개발건
+- [x] 리치텍스트박스 텍스트출력 수정 
+- [x] 일정시간 이후  출력된 이전 텍스트 삭제
+  - 텍스트박스에 데이터가 계속 쌓이면 프로그램 사용메모리가 증가
+- [x] 연결 후 연결종료 처리
+- [ ] MQTT Broker연결 Publish 구현
+- [ ] MySQL DB 센싱데이터 저장
+
+##### 1차 완료 실행결과
+
+![alt text](image-56.png)
+
+#### MQTT 브로커
+
+- MQTT를 사용하는 클라이언트, 서버끼리 직접통신하지 않음
+- 모든 메시지가 Broker를 통해서 전달
+
+##### 브로커의 기능
+
+1. 메시지 중계
+2. Topic 관리 - 개발사가 결정
+  - smarthome/d103703 - 103동 703호 데이터 처리
+  - smarthome/d101101 - 101동 101호 데이터 처리
+  - smarthome/# - 모든 데이터 수신
+3. QoS(Quality of Service) 메시지 전달 보장수준 관리
+  - 전송 실패시 다시 보낼지, 버리고 다음 데이터를 보낼지 결정
+4. 보안관리
+
+##### 브로커 종류
+- Eclipse Mosquitto - 무료, 사용쉬움, 오픈소스, 라즈베리파이 지원가능
+- EMQX - 대규모서비스용, 수백만연결, 클러스터링
+- HiveMQ - 기업용 MQTT 브로커, 고성능, 클라우드 지원
+
+##### Mqtt 브로커(mosquitto) 설치
+
+1. https://mosquitto.org/ 사이트에서 Download > Windows > mosquitto-2.1.2-install-windows-x64.exe 설치
+2. 윈도우 시작 > services.msc 실행
+
+![alt text](image-57.png)
+
+3. https://mqtt-explorer.com/
+
+
+##### Mosquitto 설정
+
+- Publish 테스트
+
+- 설치경로\mosquitto.conf 파일
+- NotePad 종류를 관리자권한으로 실행
+
+```conf
+# Config file for mosquitto
+...
+# MQTT 브로커 port번호 변경 원하면 주석 제거
+# 1883 default port
+listener 1883
+# 누군가 접속을 허용하려면
+allow_anonymous true
+```
+
+- 윈도우 서비스에서 Mosquitto 서비스 재시작
+
+- Mosquitto 설치된 IP주소 확인
+
+##### Mosquitto 계정 암호화
+
+- Mosquitto 설치 폴더(시스템폴더라 파일생성 불가)에서 콘솔(Powershell) 오픈
+- 윈도우 시작 > powershell 실행
+
+```powershell
+# root 계정의 암호파일을 생성
+> .\mosquitto_passwd.exe -c password.txt root
+Password:
+
+Reenter password:
+
+Adding password for user root
+```
+
+- password.txt 파일 생성
+- Mosquitto 설치폴더에 복사
+
+- 서비스에서 Mosquitto 중지
+- Notepad에서 철치경로\mosquitto.conf 파일 오픈
+
+```conf
+# 암호계정으로 접속 허용
+allow_anonymous false
+# 계정암호 파일 설정
+password_file c:/Program Files/Mosquitto/password.txt
+```
+
+- MQTT Explorer 접속 테스트
+
+![alt text](image-58.png)
+
+#### MQTT Publish 구현
+- Dummy IoT Data 앱에서 구현
+
+##### MQTTnet 패키지 설치
+- NuGet 패키지 관리에서 MQTTnet 검색 후 설치
+
+
+#### SmartHome 모니터링
+
+### MVVM은 나중에
+
+#### Dummy IoTData 생성
+- 1초마다 DB에 저장
+
 ## 2. Unity 실습
+
+### 2.1 Essentials PathWay
+
+### 2.2 Unity Factory 

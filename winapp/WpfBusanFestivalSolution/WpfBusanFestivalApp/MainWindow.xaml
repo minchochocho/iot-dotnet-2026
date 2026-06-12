@@ -1,4 +1,5 @@
-﻿<mah:MetroWindow x:Class="WpfBusanFestivalApp.MainWindow"
+﻿<mah:MetroWindow 
+        x:Class="WpfBusanFestivalApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -154,9 +155,13 @@
                             VerticalAlignment="Center" Margin="14,0">
                     <Ellipse Width="8" Height="8" Fill="#9E9E9E" Margin="0,0,6,0"/>
                     <TextBlock Text="공공데이터포털 Open API 활용"
-                               Foreground="#888888"
+                               Foreground="White"
                                FontSize="12"
                                VerticalAlignment="Center"/>
+                    <Separator Background="White" />
+                    <StatusBarItem>
+                        <TextBlock x:Name="SbiStatus"/>
+                    </StatusBarItem>
                 </StackPanel>
                 <TextBlock Grid.Column="1"
                            Text="부산 축제정보 v1.0"
@@ -232,6 +237,17 @@
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Right">
+
+                        <mah:NumericUpDown x:Name="NumPageNo"
+                                           Visibility="Collapsed"
+                                           Value="1"
+                                           Minimum="1"/>
+                        <mah:NumericUpDown x:Name="NumOfRows"
+                                           Visibility="Collapsed"
+                                           Value="10"
+                                           Minimum="10"
+                                           Maximum="100"
+                                           Interval="10"/>
 
                         <!-- 페이지 스테퍼 -->
                         <StackPanel Orientation="Horizontal"
@@ -312,7 +328,8 @@
                                 Height="38"
                                 Content="검색"
                                 Style="{StaticResource SearchButtonStyle}"
-                                Background="#6B8EDB"/>
+                                Background="#6B8EDB"
+                                Click="BtnSearch_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -325,7 +342,7 @@
                     <DropShadowEffect Color="#BBBBBB" BlurRadius="10"
                                       ShadowDepth="2" Opacity="0.3"/>
                 </Border.Effect>
-                <DataGrid x:Name="DgFestival"
+                <DataGrid x:Name="DgrFestival" MouseDoubleClick="DgrFestival_MouseDoubleClick"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           HeadersVisibility="Column"
