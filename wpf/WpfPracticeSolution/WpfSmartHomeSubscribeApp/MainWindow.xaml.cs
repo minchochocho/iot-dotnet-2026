@@ -1,17 +1,14 @@
-﻿using Bogus;
-using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls.Dialogs;
 using MQTTnet;
-using System.Net;
 using System.Text;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
-using WpfSmartHomeSensingApp.Helpers;
-using WpfSmartHomeSensingApp.Models;
+using WpfSmartHomeSubscribeApp.Helpers;
+using FontFamily = System.Windows.Media.FontFamily;
 
-namespace WpfSmartHomeSensingApp {
+namespace WpfSmartHomeSubscribeApp {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -20,14 +17,9 @@ namespace WpfSmartHomeSensingApp {
 
         private CancellationTokenSource? _cts;  // 스레드 캔슬객체
 
-        #region DummyData용 속성/변수들
-        private string[] Rooms { get; set; } = Array.Empty<string>();
-        private string HomeId { get; set; } = string.Empty;
-        private Faker SmartHomeFaker { get; set; } = new("ko");
-        #endregion
+        #region MQTT/DB 전송용 속성/변수
 
-        #region MQTT 전송용 속성/변수
-
+        // MQTT
         private IMqttClient? MqttClient { get; set; }
 
         private string MqttHost { get; set; } = "127.0.0.1";    // TxtMqttBrokerIp 텍스트박스의 IP로 변경되어야 함
@@ -40,6 +32,15 @@ namespace WpfSmartHomeSensingApp {
 
         private string MqttTopic { get; set; } = "home/sensor";
 
+        // DB
+        private string DbHost { get; set; } = "127.0.0.1";
+        private string DbUser { get; set; } = "root";
+        private string DbPassword { get; set; } = "my123456";
+        private string DbName { get; set; } = "smarthome";
+
+
+
+
         #endregion
 
         # region 생성자 영역
@@ -47,31 +48,40 @@ namespace WpfSmartHomeSensingApp {
         {
             InitializeComponent();
             IsConnected = false;
-            InitFakeData();
         }
         #endregion
 
         #region 이벤트 핸들러 영역
         private async void BtnConnect_Click(object sender, RoutedEventArgs e)
         {
+            // 입력검증
             if (string.IsNullOrWhiteSpace(TxtMqttBrokerIp.Text))
             {
                 await this.ShowMessageAsync("오류", "MQTT 브로커 주소를 입력하세요.");
-                Common.logger.Info("MQTT 브로커 주소 미입력!");
+                Common.logger.Warn("MQTT 브로커 주소 미입력!");
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(TxtMqttTopiIp.Text))
+            {
+                await this.ShowMessageAsync("오류", "MQTT 토픽을 입력하세요.");
+                Common.logger.Warn("MQTT 토픽 미입력!");
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(TxtDatabaseIp.Text))
+            {
+                await this.ShowMessageAsync("오류", "Database IP를 입력하세요.");
+                Common.logger.Warn("Database IP 미입력!");
 
                 return;
             }
 
             MqttHost = TxtMqttBrokerIp.Text.Trim(); // Mqtt호스트 값 127.0.0.1 -> UI에서 입력한 HostIP로 변경
-
-
-            if (!IPAddress.TryParse(TxtMqttBrokerIp.Text, out _))
-            {
-                await this.ShowMessageAsync("오류", "IP 주소 형식이 올바르지 않습니다.");
-                Common.logger.Info("올바르지않은 IP 주소형식!");
-
-                return;
-            }
+            MqttTopic = TxtMqttTopiIp.Text.Trim();
+            DbHost = TxtDatabaseIp.Text.Trim();
 
             if (!IsConnected)
             {
@@ -80,8 +90,9 @@ namespace WpfSmartHomeSensingApp {
 
                 IsConnected = true;
                 TxtStatus.Text = "DISCONNECT";
+                AddLogs("SYSTEM", "MQTT Subscribe 접속 시작");
+                Common.logger.Info("MQTT Subscribe 접속 시작");
                 SbiStatus.Text = "MQTT연결시작";
-                StartSensingAsync();
             }
             else
             {
@@ -94,70 +105,21 @@ namespace WpfSmartHomeSensingApp {
                     await MqttClient.DisconnectAsync();
 
                     AddLogs("SYSTEM", "MQTT 브로커 접속 종료");
-                    Common.logger.Info("Bogus Faker 처리종료");
+                    Common.logger.Info("MQTT Subscribe 접속 종료");
                     SbiStatus.Text = "MQTT 연결 종료";
                 }
-
             }
         }
 
         #endregion
 
         #region 커스텀 메서드 영역
-        private void InitFakeData()
-        {
-            Rooms = new[] { "BED", "BATH", "LIVING", "DINING" };
-            HomeId = "D10H703";
-            SmartHomeFaker = new Faker("ko");
-
-            Common.logger.Info("Bogus Faker 초기화 완료");
-        }
-
         private void StopSensing()
         {
             _cts.Cancel();
         }
-        /// <summary>
-        /// Dummy Sensing값 생성 시작 메서드
-        /// </summary>
-        /// <returns></returns>
-        private async Task StartSensingAsync()
-        {
-            _cts = new CancellationTokenSource();
-            try
-            {
-                while (!_cts.Token.IsCancellationRequested)
-                {
-                    List<SensorData> lists = Rooms.Select(room => new SensorData
-                    {
-                        HomeId = HomeId,
-                        RoomName = room,
-                        SensingDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                        Temp = Math.Round(SmartHomeFaker.Random.Double(20, 30), 1),
-                        Humid = Math.Round(SmartHomeFaker.Random.Double(40, 70), 1),
-                    }).ToList();
-
-                    string json = JsonSerializer.Serialize(lists, new JsonSerializerOptions { WriteIndented = true });
-
-                    // Console.WriteLine(json);
-                    AddLogs(MqttTopic, json);
-                    await PublishMqttAsync(MqttTopic, json);
-
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-                }
-
-            }
-            catch (Exception)
-            {
-            }
-
-        }
-
         private void AddLogs(string topic, string payload)
         {
-            // 언젠가 응답없음이 뜸
-            // RtbLog.AppendText($"{topic} : {payload}\r\n");  // 이방식으로 텍스트 입력 가능
-
             // RichTextBox 활용
             Dispatcher.Invoke(() =>
             {
@@ -208,10 +170,19 @@ namespace WpfSmartHomeSensingApp {
             var factory = new MqttClientFactory();
             MqttClient = factory.CreateMqttClient();    // DesignPattern 중 Factory 메서드 방식으로 객체 생성   
 
-            // DesignPattern Builder 사용
-            // .으로 붙여서 체인메서드 사용
+            // Subscribe 핵심 - 데이터가 Publish(배포)되면 곧바로 Subscribe(구독)
+            // Subscribe 실행후 payload가 넘어왔을때 이벤트 처리
+            MqttClient.ApplicationMessageReceivedAsync += async e =>
+            {
+                string topic = e.ApplicationMessage.Topic;
+
+                string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+
+                AddLogs(topic, payload);
+            };
+
             var options = new MqttClientOptionsBuilder()
-                .WithClientId($"WPF-SmartHome-{Guid.NewGuid()}")
+                .WithClientId($"WPF-Subscribe-{Guid.NewGuid()}")
                 .WithTcpServer(MqttHost, MqttPort)
                 .WithCredentials(MqttUser, MqttPassword)
                 .WithCleanSession()
@@ -219,31 +190,18 @@ namespace WpfSmartHomeSensingApp {
 
             await MqttClient.ConnectAsync(options);
 
-            AddLogs("SYSTEM", "Mqtt Broker Connected");
-        }
-        /// <summary>
-        /// MQTT 브로커로 메시지 publish 메서드
-        /// </summary>
-        /// <param name="topic">토픽(주제)</param>
-        /// <param name="payload">전송할 메시지(json타입)</param>
-        private async Task PublishMqttAsync(string topic, string payload)
-        {
-            // Mqtt 클라이언트가 초기화가 안됐거나, 접속이 안됐다면
-            if (MqttClient == null || !MqttClient.IsConnected)
-            {
-                AddLogs("ERROR", "MQTT 브로커에 접속되지 않았습니다");
-                return;
-
-            }
-            // 실제 전달할 메시지(페이로드) 작성
-            var message = new MqttApplicationMessageBuilder()
-                .WithTopic(topic)   // 이 토픽으로 데이터 송수신
-                .WithPayload(Encoding.UTF8.GetBytes(payload))  // string을 byte[]로 변경
-                .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce) // 데이터 전송 후 체크X, Qos레벨 못보낸게 있으면 그냥 무시 한번만
+            // subscribe 옵션
+            var subscribeOptions = factory
+                .CreateSubscribeOptionsBuilder()
+                .WithTopicFilter(MqttTopic)
                 .Build();
 
-            await MqttClient.PublishAsync(message);
+            // subscribe 실행
+            await MqttClient.SubscribeAsync(subscribeOptions);
+
+            AddLogs("SYSTEM", "Mqtt 구독 시작!");
         }
+
 
         #endregion
     }

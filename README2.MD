@@ -134,6 +134,8 @@ OrderItem - 주문리스트 저장
 #### 전체 실행결과
 ![실행결과](./실행결과.gif)
 
+- [소스폴더](./wpf/WpfPracticeSolution/WofKioskApp/)
+
 ---
 
 ### 1.2 OpenAPI 연동앱 개발
@@ -396,7 +398,13 @@ logger.Fatal("매우 중대한 오류");
 
 #### 완성 실행결과
 
+- [소스폴더](./wpf/WpfPracticeSolution/WpfBusanFestivalSolution)
+
 ### SmartHome 솔루션
+
+- 참조 UI 이미지
+
+![alt text](image-59.png)
 
 #### MQTT
 
@@ -546,6 +554,14 @@ password_file c:/Program Files/Mosquitto/password.txt
 ##### MQTTnet 패키지 설치
 - NuGet 패키지 관리에서 MQTTnet 검색 후 설치
 
+##### 실행화면
+
+
+#### MQTT Subscribe 앱
+- MQTT 메시지 수신, DB 저장 기능
+- MQTT Publish 앱 복사, 커스터마이징
+
+##### 구독 실행화면
 
 #### SmartHome 모니터링
 
