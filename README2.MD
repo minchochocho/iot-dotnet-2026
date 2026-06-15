@@ -555,7 +555,7 @@ password_file c:/Program Files/Mosquitto/password.txt
 - NuGet 패키지 관리에서 MQTTnet 검색 후 설치
 
 ##### 실행화면
-
+![실행화면](./KakaoTalk_20260615_102738862.gif)
 
 #### MQTT Subscribe 앱
 - MQTT 메시지 수신, DB 저장 기능
@@ -563,12 +563,44 @@ password_file c:/Program Files/Mosquitto/password.txt
 
 ##### 구독 실행화면
 
-#### SmartHome 모니터링
+![구독 실행화면](./KakaoTalk_20260615_114704331.gif)
 
-### MVVM은 나중에
+##### NuGet 패키지 설치
+
+- MySQLConnector 추가
+
+##### DB 테이블 생성
+
+```sql
+CREATE TABLE sensor_data
+(
+    sensor_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    home_id VARCHAR(50) NOT NULL,
+    room_name VARCHAR(50) NOT NULL,
+    sensing_datetime DATETIME NOT NULL,
+    temp DOUBLE NOT NULL,
+    humid DOUBLE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+##### DB 저장 확인
+![alt text](image-60.png)
+
+![alt text](image-61.png)
+
+---
+
+#### SmartHome 모니터링 앱
+- MQTT Subscribe 기능
+
+
 
 #### Dummy IoTData 생성
 - 1초마다 DB에 저장
+
+### MVVM은 나중에
+
 
 ## 2. Unity 실습
 

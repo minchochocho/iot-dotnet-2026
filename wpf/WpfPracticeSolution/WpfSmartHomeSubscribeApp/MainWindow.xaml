@@ -39,7 +39,7 @@
                 <Label Content="MQTT Broker IP" VerticalAlignment="Center" />
                 <TextBox x:Name="TxtMqttBrokerIp" Width="90" Margin="5" VerticalAlignment="Center"
                      mah:TextBoxHelper.Watermark="브로커 아이피"
-                     Text="192.168.0.108" />
+                     Text="192.168.0.3" />
                 <Label Content="MQTT Topic IP" VerticalAlignment="Center" />
                 <TextBox x:Name="TxtMqttTopiIp" Width="90" Margin="5" VerticalAlignment="Center"
                  mah:TextBoxHelper.Watermark="브로커 토픽"
@@ -47,7 +47,7 @@
                 <Label Content="Database IP" VerticalAlignment="Center" />
                 <TextBox x:Name="TxtDatabaseIp" Width="90" Margin="5" VerticalAlignment="Center"
                  mah:TextBoxHelper.Watermark="데이터베이스 아이피"
-                 Text="192.168.0.108" />
+                 Text="192.168.0.3" />
                 <Button x:Name="BtnConnect" Margin="5" Click="BtnConnect_Click"
                     Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}" >
                     <StackPanel Orientation="Horizontal">
