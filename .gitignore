@@ -644,3 +644,42 @@ InitTestScene*.unity*
 **/[Aa]ssets/[Ss]ceneDependencyCache*
 
 **/[Aa]ssets/Tutorials/
+
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+
+# VS
+.vs/
+*.csproj
+*.sln
+
+# --- Unity project (final override) ---
+# Unity .meta files must be versioned.
+!*.meta
+
+# Re-ignore known generated .meta files that should not be tracked.
+*.blend1.meta
+*.unitypackage.meta
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Unity generated/local folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Optional Unity tools/cache
+[Aa]ssets/AssetStoreTools*

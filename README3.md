@@ -130,6 +130,14 @@
 ### Chapter2
 ![alt text](image-77.png)
 
+#### Chapter3 
+
+- 냄비 프리팹 선택. 가스레인지 위 위치
+- Audio Source 컴포넌트 추가
+- Audio Generator 선택, Loop 체크
+
+![alt text](image-79.png)
+
 ---
 ### 2.3 Unity Factory 
 
@@ -152,3 +160,4 @@
 - Global Volume을 오브젝트, 사용체크 비활성화
 
 ![alt text](image-78.png)
+
