@@ -225,6 +225,10 @@ public class Collectable : MonoBehaviour {
 }
 ```
 
+#### 실행화면
+
+- ![에센셜실행결과](./에센셜2.gif)
+
 #### 점프기능 추가
 
 - PlayerController.cs에 공용변수, Update() 추가
@@ -365,6 +369,15 @@ private void OnTriggerEnter(Collider other)
 
 ### 2.2 3D 모델 불러오기
 
+#### 렌더링 파이프라인
+
+- 오브젝트 생성, 카메라 확인, 빛 계산, 그림자 계산, 재질 생성/계산, 후처리 후 모니터 출력 등의 순서과정
+
+#### Built-in / SRP
+
+- Built-in - Unity가 렌더링 방식 고정. 수정 어려움
+- SRP(Scriptable Render Pipiline) - Unity는 뼈대만 제공, 개발자가 원하는 렌더링을 추가하는 방식
+
 #### 프로젝트 구분
 
 - 렌더링 파이프라인 종류 3가지 구분
@@ -373,7 +386,137 @@ private void OnTriggerEnter(Collider other)
 |---|---|---|---|
 | Built-in | 보통 | 보통 | 보통 |
 | URP | 높음 | 높음 | 높음 |
-| HDRP | 낮음(고사양) |  |  |
+| HDRP | 낮음(고사양) | 매우좋음 | 제한적 |
+
+- 기본적으로 Built-in으로 학습
+
+![alt text](image-93.png)
+
+- 에셋스토어에서 제공하는 에셋의 RP 종류를 확인하고 사용할 것
+
+#### 3D 모델 활용법
+
+- 유니티에서는 3D 모델링이 아주 제한적
+- 3D 모델 활용방법
+    - Blender 무료 3D 모델링 툴에서 작업한 모델 import
+    - 3D Max, Rhino 상용 모델링 툴 작업 모델 import 
+    - Unity Asset Store에서 제공하는 3D 모델 import 
+    - 생성형 AI 모델 생성 import
+![alt text](image-94.png)
+
+#### 3D 모델 가져오기
+
+- https://poly.pizza/
+- https://sketchfab.com/
+- https://www.cgtrader.com/ 에서 검색
+
+![alt text](image-95.png)
+
+- 호환되는 파일 포맷
+    - FBX : Autodesk 3D(AutoCAD) 교환 포맷. Unity에서 가장호환
+    - OBJ : 범용 정적 모델 포맷. Unity에서 사용 가능
+    - STL : 3D 프린터용포맷. 비추천
+    - BLEND : Blender 원본 파일. 가능(Blender 설치)
+    - 3DS : 구형 Autodesk 3D Studio. 사용 가능
+
+- 스캐치팹 사이트 > Conveyer Belt 검색 > 로그인 후 다운로드
+
+- 압축해제, fbx, 텍스처를 프로젝트 Assets 폴더 아래 이동
+
+![alt text](image-97.png)
+
+- Models 폴더에 위치한 Conveyor를 scene 뷰에 드래그
+
+![alt text](image-96.png)
+
+#### 생산품 박스
+
+- Cube 오브젝트로 생성
+- 구글에서 `Plastic Normal Map` 검색
+- 텍스처 이미지 저장 > Assets > Textures 아래 위치
+- Material 생성, Base Map 앞 사각형에 텍스쳐를 드래그
+
+![alt text](image-98.png)
+
+#### 컨베이어 벨트 물리 컴포넌트 적용
+
+- Belt에만 Collider 추가
+    - Mesh Colider : 3D 모델 폴리곤 메시 개수만큼 충돌영역 지정. 리소스 부하
+    - `Box Colider` : 큐브 형태로 충돌영역을 지정. 리소스 부하 적음
+
+#### 컨베이어 벨트 스크립트
+
+- ConveyorBelt.cs 스크립트 생성
+- 충돌이 감지되는 동안 물체이동
+
+```cs
+using UnityEngine;  // 유니티 엔진 클래스
+
+// MonoBehaviour C# 스크립트가 기본적으로 상속받는 핵심 클래스
+// 개발자코드가 유니티 엔진과 인터렉티브하게 소통할 수 있도록
+// 오브젝트에 컴포넌트로 연결, 동작을 제어
+public class ConveyorBelt : MonoBehaviour {
+    [Header("물체이동 방향")]
+    public Vector3 moveDirection = Vector3.right;
+
+    [Header("물체이동 속도")]
+    public float speed = 2.0f;
+    // 매 프레임 두 충돌영역이 접촉하고 있는 동안 발생
+    private void OnCollisionStay(Collision collision)
+    {
+        Rigidbody rb = collision.rigidbody; // 충돌감지된 오브젝트의 리지드바디를 가져옴
+        if (rb != null)
+        {
+            rb.linearVelocity = moveDirection.normalized * speed;   // 이동방향으로 속도만큼 이동(값을줌)
+        }
+    }
+}
+
+```
+![alt text](image-99.png)
+
+- 컨베이어 오브젝트 중 Collider 컴포넌트를 적용한 벨트에 스크립트 할당
+
+#### Box Spawner 생성
+
+- 박스를 일정시간마다 하나씩 생성하도록 하는 기능
+- Product 박스와 컨베이어 모두 프리팹으로 이동
+
+    ![alt text](image-100.png)
+
+- EmptyObject 생성, 위치를 이전 Projuct 위치로 지정
+- BoxSpawner.cs 스크립트
+
+```cs
+public class BoxSpawner : MonoBehaviour {
+    [Header("프리팹 지정")]
+    public GameObject prdPrefab;
+
+    [Header("생성 간격")]
+    public float interval = 3.0f;
+
+    float timer;
+
+    void Update(){
+        timer = Time.deltaTime; // HW 성능별 FPS 고정
+
+        if (timer > interval){
+            timer = 0;
+
+            // instant 예제, 샘플
+            // Quaternion.identity 회전값이 없는 상태
+            Instantiate(prdPrefab,
+                        transform.position,
+                        Quaternion.identity);
+        }
+    }
+}
+```
+
+- Spawner 빈오브젝트에 스크립트 할당
+
+#### 실행결과
+- ![컨베이어실행결과](./컨베이어.gif)
 
 ### 2.3 Unity Factory  
 
