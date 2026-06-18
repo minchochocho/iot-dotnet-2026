@@ -362,6 +362,19 @@ private void OnTriggerEnter(Collider other)
 
 ![alt text](image-92.png)
 ---
+
+### 2.2 3D 모델 불러오기
+
+#### 프로젝트 구분
+
+- 렌더링 파이프라인 종류 3가지 구분
+
+| 종류 | 성능 | 그래픽품질 | 모바일/VR지원 |
+|---|---|---|---|
+| Built-in | 보통 | 보통 | 보통 |
+| URP | 높음 | 높음 | 높음 |
+| HDRP | 낮음(고사양) |  |  |
+
 ### 2.3 Unity Factory  
 
 - Unity Japan에서 제공하는 무료 HDRP 공장 시뮬레이션 에셋
