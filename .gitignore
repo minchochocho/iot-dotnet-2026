@@ -683,3 +683,19 @@ UserSettings/
 
 # Optional Unity tools/cache
 [Aa]ssets/AssetStoreTools*
+
+# --- Prevent very large asset uploads ---
+# Unity generated lighting artifacts
+**/[Ll]ightmap-*_comp_light.exr
+**/[Ll]ightingData.asset
+**/ReflectionProbe-*.exr
+
+# Large source/art files (keep local)
+*.exr
+*.hdr
+*.psd
+*.tga
+*.tif
+*.tiff
+*.mov
+*.mp4
