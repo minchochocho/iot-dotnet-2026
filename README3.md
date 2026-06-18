@@ -367,6 +367,8 @@ private void OnTriggerEnter(Collider other)
 ![alt text](image-92.png)
 ---
 
+
+
 ### 2.2 3D 모델 불러오기
 
 #### 렌더링 파이프라인
@@ -428,6 +430,8 @@ private void OnTriggerEnter(Collider other)
 - Models 폴더에 위치한 Conveyor를 scene 뷰에 드래그
 
 ![alt text](image-96.png)
+
+#### 2.3 생산라인
 
 #### 생산품 박스
 
@@ -518,7 +522,200 @@ public class BoxSpawner : MonoBehaviour {
 #### 실행결과
 - ![컨베이어실행결과](./컨베이어.gif)
 
-### 2.3 Unity Factory  
+#### 컨베이어 벨트 여러개 구성
+
+- 프리팹 드래그 추가
+
+#### 컨베이어 벨트 멈추기 기능
+
+- BoxSpawner.cs 열기
+- 로직 변경
+
+```cs
+public class ConveyorBelt : MonoBehaviour {
+    ...
+    [Header("벨트 동작여부")]
+    public bool isRunning = true;
+    private void OnCollisionStay(Collision collision)
+    {
+        Rigidbody rb = collision.rigidbody;
+
+        if (rb == null) return;
+
+        if (!isRunning){
+            rb.linearVelocity = Vector3.zero; // 0으로 초기화
+            return;
+        }
+        rb.linearVelocity = moveDirection.normalized * speed;   // 이동방향으로 속도만큼 이동(값을줌)
+    }
+
+    public void StopBelt(){
+        isRunning = false;
+    }
+
+    public void StartBelt(){
+        isRunning = true;
+    }
+}
+```
+
+- 벨트 동작여부 체크 확인
+
+![alt text](image-101.png)
+
+- 컨베이어 끝에 센서가 있다고 가정. Collider 트리거가 발생하면 멈춤
+- 빈 오브젝트 생성 > Sensor 명명
+- Sensor 오프젝트 > Box Collider 컴포넌트 추가. `Is Trigger` 체크
+- Edit Collider 아이콘 클릭 위치, 크기 조정
+
+![alt text](image-102.png)
+
+- SensorTrigger.cs 스크립트 생성
+- Sensor 객체에 스크립트 추가
+
+```cs
+public class SensorTrigger : MonoBehaviour
+{
+    // 다른 Collider가 들어와서 Trigger 발생하면?
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("제품 감지!");
+    }
+}
+```
+
+- 콘솔로 변경, 시작
+
+```cs
+public class SensorTrigger : MonoBehaviour
+{
+    [Header("컨베이어 1")]
+    public ConveyorBelt conveyor1;
+
+    [Header("컨베이어 2")]
+    public ConveyorBelt conveyor2;
+
+    private bool isProcessing = false;
+
+    // 다른 Collider가 들어와서 Trigger 발생하면?
+    private void OnTriggerEnter(Collider other)
+    {
+        if (isProcessing) return;
+
+        if (other.CompareTag("Product"))
+        {
+            // 시간이 걸리는 작업을 여러 프레임에 나눠서 실행하는 기능
+            StartCoroutine(Process());
+        }
+    }
+
+    private IEnumerator Process()
+    {
+        isProcessing = true;
+
+        Debug.Log("제품 감지!");
+
+        conveyor1.Stop();  // isRunning = false;
+        conveyor2.Stop();
+
+        yield return new WaitForSeconds(3.0f);  // 3초동안 대기한 뒤 다음로직으로 
+
+        conveyor1.StartBelt();
+        conveyor2.StartBelt();
+
+        yield return new WaitForSeconds(1.0f); 
+
+        isProcessing = false;
+    }
+}
+
+```
+
+- ConveyorBelt 컨베이어 1번 변수에 Collider 지정된 벨트 객체 할당
+- ConveyorBelt 컨베이어 2번 변수에 Collider 지정된 벨트 객체 할당
+
+
+- Product 프리팹에 `Product` 태그 생성 지정
+
+
+#### 벨트 동작화면
+
+#### 컨베이어, 스폰 기능 동기화
+
+- TODO
+
+---
+
+### 2.4 ProBuilder
+
+#### 개요
+
+- Unity에서 건물을 손쉽게 만들 수 있도록 도와주는 패키지
+
+#### 설치
+
+- Windows > Package Manager > Unity Registry에서 ProBuilder 검색 후 설치
+
+![alt text](image-103.png)
+
+#### 사용법
+
+- 메뉴 Tools > ProBuilder > Create Shape > 오브젝트 선택
+
+![alt text](image-104.png)
+
+- Heirachy 창 > 마우스 오른쪽 > ProBuilder > 오브젝트 선택
+
+- Scene 뷰 > ProBuilder 선택
+
+![alt text](image-105.png)
+
+- Cube 상태에서...
+- Vertex Selection(점 선택), Edge Selection(선 선택), Face Selection(면 선택)
+- Move, Rotate, Scale 기능으로 오브젝트 Shape를 변형
+
+![alt text](image-106.png)
+
+- 3D 모델링툴 Blender와 유사한 기능
+
+#### Tip
+
+- 바닥 오브젝트, 기타 오브젝트를 공간없이 
+    - Cube에서 
+
+#### 오브젝트 변형법
+
+- Probuilder 큐브 생성
+- 변형툴바 Probuilder 선택
+- Face Selection 클릭, 앞쪽세로면 선택 Move 기능으로 확장
+
+![alt text](image-107.png)
+
+- Edge Selection 클릭, 왼쪽상단 선 선택 Move 기능으로 축소
+
+![alt text](image-108.png)
+
+- Face.. 클릭, 반대편, 면 클릭, Context Menu, 
+
+![alt text](image-109.png)
+
+- Move, Rotate, Scale 사용 - 모양을 변형
+- Face.. 클릭, Cube 상단 클릭
+- Shift 누른 상태에서 Scale 조정
+![alt text](image-111.png)
+
+- Edge.. 클릭 최상후면 선 클릭 > Bezel Edge 선택
+
+![alt text](image-110.png)
+
+- Edge를 여러개 선택 > Bezel Edge 선택
+![alt text](image-112.png)
+
+- 바닥에서 1번 마우스 드래그드롭으로 x, z 넓이 생성, 2번 드래그드롭으로 y 
+
+
+
+### Unity Factory  
 
 - Unity Japan에서 제공하는 무료 HDRP 공장 시뮬레이션 에셋
 - 공장건물부터 컨베이어라인, 로봇팔, 작업자, 조명 ...
