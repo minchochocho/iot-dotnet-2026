@@ -639,10 +639,84 @@ public class SensorTrigger : MonoBehaviour
 
 
 #### 벨트 동작화면
+- ![벨트 동작화면](./KakaoTalk_20260618_150725179.gif)
 
 #### 컨베이어, 스폰 기능 동기화
 
-- TODO
+- 센서가 감지되면 Conveyor와 Spawner를 같이 중지
+- BoxSpawner.cs 수정
+
+```cs
+void Update()
+{
+    if (!isRunning) return; // isRunning이 false면 아래 로직 실행
+    timer += Time.deltaTime; // HW 성능별 FPS 고정
+    if (timer > interval)
+    {
+        timer = 0;
+        Instantiate(prdPrefab,
+                    transform.position,
+                    Quaternion.identity);
+    }
+}
+public void StopSpawner()
+{
+    isRunning = false;
+}
+public void StartSpawner()
+{
+    isRunning = true;
+}
+```
+
+
+- SensorTrigger.cs 수정, 
+
+
+```cs
+[Header("박스 생성기")]
+public BoxSpawner spawner;
+
+private bool isProcessing = false;
+
+// 다른 Collider가 들어와서 Trigger 발생하면?
+private void OnTriggerEnter(Collider other)
+{
+    if (isProcessing) return;
+
+    if (other.CompareTag("Product"))
+    {
+        // 시간이 걸리는 작업을 여러 프레임에 나눠서 실행하는 기능
+        StartCoroutine(Process());
+    }
+}
+
+private IEnumerator Process()
+{
+    isProcessing = true;
+
+    Debug.Log("제품 감지 - 컨베이어/스폰 중지!");
+
+    conveyor1.StopBelt();  // isRunning = false;
+    conveyor2.StopBelt();
+    spawner.StopSpawner();
+
+    yield return new WaitForSeconds(3.0f);  // 3초동안 대기한 뒤 다음로직으로 
+
+    conveyor1.StartBelt();
+    conveyor2.StartBelt();
+    spawner.StartSpawner();
+
+    yield return new WaitForSeconds(1.0f);
+
+    isProcessing = false;
+}
+```
+![alt text](image-127.png)
+
+#### 최종 실행결과
+
+- ![컨베이어2](/컨베이어2.gif)
 
 ---
 
@@ -664,9 +738,12 @@ public class SensorTrigger : MonoBehaviour
 
 ![alt text](image-104.png)
 
-- Heirachy 창 > 마우스 오른쪽 > ProBuilder > 오브젝트 선택
-
+- Heirarchy 창 > 마우스 오른쪽 > ProBuilder > 오브젝트 선택
+- 프로빌더로 생성한 오브젝트 선택 후
 - Scene 뷰 > ProBuilder 선택
+![alt text](image-113.png)
+
+- 상단 툴바에 프로빌더 아이콘 버튼 추가
 
 ![alt text](image-105.png)
 
@@ -681,7 +758,7 @@ public class SensorTrigger : MonoBehaviour
 #### Tip
 
 - 바닥 오브젝트, 기타 오브젝트를 공간없이 
-    - Cube에서 
+    - Cube에서 V키 누른 상태에서 위치이동
 
 #### 오브젝트 변형법
 
@@ -698,10 +775,14 @@ public class SensorTrigger : MonoBehaviour
 - Face.. 클릭, 반대편, 면 클릭, Context Menu, 
 
 ![alt text](image-109.png)
-
+![alt text](image-114.png)
 - Move, Rotate, Scale 사용 - 모양을 변형
 - Face.. 클릭, Cube 상단 클릭
 - Shift 누른 상태에서 Scale 조정
+![alt text](image-115.png)
+
+- Context Menu > Extrude Faces 클릭
+
 ![alt text](image-111.png)
 
 - Edge.. 클릭 최상후면 선 클릭 > Bezel Edge 선택
@@ -709,9 +790,66 @@ public class SensorTrigger : MonoBehaviour
 ![alt text](image-110.png)
 
 - Edge를 여러개 선택 > Bezel Edge 선택
-![alt text](image-112.png)
 
-- 바닥에서 1번 마우스 드래그드롭으로 x, z 넓이 생성, 2번 드래그드롭으로 y 
+![alt text](image-112.png)
+![alt text](image-116.png)
+
+- 바닥에서 1번 마우스 드래그드롭으로 x, z 넓이 생성, 2번 드래그드롭으로 y 1
+
+![alt text](image-117.png)
+
+### 큐브형태 벽 생성
+
+- 기존 큐브 > Face 선택 > Scale 조정
+- Shift 누른 상태에서 크기 조정
+
+![alt text](image-118.png)
+
+- 원본 면 크기보다 작게 조정가능
+- Move 선택
+- Shift 누른 상태에서 위치이동
+
+![alt text](image-119.png)
+
+- 반복잡업, 벽 생성
+
+
+#### 문, 창문 만들기
+
+- 직교기준 Edge 선택 > Context Menu > Insert Edge Loop 클릭
+
+![alt text](image-120.png)
+
+- 창문, 문 위치 Face 선택 > Move 선택, 창문/문 내려는 방향으로
+- Shift 누른 상태에서 이동
+
+![alt text](image-122.png)
+
+- Context Menu > Delete Face 선택
+- 반대편 면에서도 Delete Face
+
+![alt text](image-121.png)
+![alt text](image-123.png)
+
+#### 재질 적용
+
+- Asset Store Web > Material 검색 > 에셋 추가
+- Unity Editor Import 
+
+- Tools > Probuilder > Editors > Material Editor 클릭
+
+![alt text](image-124.png)
+
+#### Material 렌더링 문제
+
+![alt text](image-125.png)
+
+- Window > Rendering > Render Pipline Convert 선택
+- Scan
+
+![alt text](image-126.png)
+
+- Convert Assets 버튼 클릭
 
 
 
@@ -737,3 +875,63 @@ public class SensorTrigger : MonoBehaviour
 
 ![alt text](image-78.png)
 
+- 기존 Scene을 다른이름으로 재저장
+- 계층창 오브젝트를 확인하면서 삭제
+
+![alt text](image-132.png)
+
+#### Splines 애니메이션 기능
+
+- 컨베이어 위 생산품 움직임, 작업자 이동 기능
+- 설치한 Splines 기능 사용
+- Hierarchy 창 > Create > Spline > 하위 메뉴 선택
+
+
+![alt text](image-133.png)
+
+![alt text](image-134.png)
+
+- 움직일 오브젝트 선택 > Add component > Spline Animate 추가
+- Spline 속성 > 적용한 Spline 지정
+- Movement Method Time Duration 변경
+
+#### Product Spline 애니메이션
+
+- TODO : 
+- 컨베이어 위 생산품 동작 기능
+- 컨베이어 생산라인 매핑되는 Spline 생성
+- 이동 후 로봇팔 챔버에 동작하면 동작 멈춤
+- 일정시간 로봇팔 애니메이션 발생
+- 생산품 Spline 위로 이동
+- CustomSplineAnimate.cs 확인 필요
+
+
+### 2.4 Unity Factory 컨버전
+
+- TODO : 나중에 다시
+
+- Unity Factory HDRP버전, URP 지원안함
+- URP 프로젝트 생성, Unity Factory Assets
+
+![alt text](image-128.png)
+
+- Package Manager > `Universal Render Pipline` 검색 후 설치
+
+![alt text](image-129.png)
+
+- URP Assest 생성
+- Create > Rendering > URP Asset (with...) 선택
+
+- Edit > Project Settings > Graphics > Default Render Pipeline 값을 HDRP 종류에서 위에서 생성한 URP 에셋으로 변경
+
+![alt text](image-130.png)
+
+- Edit > Project Settings > Quality > Render Pipeline Asset을 URP로 변경
+
+![alt text](image-131.png)
+
+- 머터리얼 변환
+
+- Window > Rendering > Render Pipeline Converter 선택
+
+### 2.4 IoT Simple Project
