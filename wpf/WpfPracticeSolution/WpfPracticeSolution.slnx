@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="WpfCafeKiosk/WpfCafeKiosk.csproj" />
+  <Project Path="WpfSmartHomeSensingApp/WpfSmartHomeSensingApp.csproj" />
+  <Project Path="WpfSmartHomeSubscribeApp/WpfSmartHomeSubscribeApp.csproj" />
+</Solution>

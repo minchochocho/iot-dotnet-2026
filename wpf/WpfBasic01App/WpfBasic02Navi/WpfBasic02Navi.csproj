@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="cat.jpg" />
+    <None Remove="iot.ico" />
+    <None Remove="sample01.mp4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="ButtonStyle.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="cat.jpg" />
+    <Resource Include="iot.ico" />
+    <Content Include="sample01.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="ButtonStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Sub04Page.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Sub03Page.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Sub02Page.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

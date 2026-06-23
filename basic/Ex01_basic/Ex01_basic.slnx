@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ConsoleApp1/ConsoleApp1.csproj" Id="44fa5f8b-c344-42fc-b6f6-0f3d203fe497" />
+  <Project Path="ConsoleApp2/ConsoleApp2.csproj" Id="cd668643-4dfe-4c66-8253-914fbbb372d7" />
+  <Project Path="Prac04Collection/Prac04Collection.csproj" Id="8efe620f-c669-4216-b1a9-e0929ccf102c" />
+  <Project Path="Prac05Exception/Prac05Exception.csproj" Id="671e32c6-2335-4bf2-949c-3c310318a073" />
+</Solution>
