@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace IndustryCSE.IoT {
-    public class DateTimeGenerator : MonoBehaviour
-    {
+    public class DateTimeGenerator : MonoBehaviour {
         [SerializeField] Text _dateTimeText;
         private DateTime _nextLogTime;
 
@@ -18,14 +15,17 @@ namespace IndustryCSE.IoT {
         // Update is called once per frame
         void Update()
         {
-            // If the current time is equal to or past the next log time...
+            // nextLogTime 보다 현재 시분초가 더 최신이면
             if (DateTime.Now >= _nextLogTime)
             {
-                // Get current date and time
+                // 현재 날짜를 변경
                 DateTime currentDateTime = DateTime.Now;
 
-                _dateTimeText.text = currentDateTime.ToString("HH:mm ddd dd MMM yyyy");
+                // 원본 포맷팅
+                //_dateTimeText.text = currentDateTime.ToString("HH:mm ddd dd MMM yyyy");
+                _dateTimeText.text = currentDateTime.ToString("yyyy-MM-dd HH:mm:ss");
                 // Update next log time
+                // 다음 로그타임 1분으로
                 _nextLogTime = DateTime.Now.AddMinutes(1);
             }
         }

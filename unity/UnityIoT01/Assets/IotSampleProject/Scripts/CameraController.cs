@@ -1,17 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
 
-public class CameraController : MonoBehaviour
-{
+public class CameraController : MonoBehaviour {
+    // 카메라가 바라볼 대상
     public Transform target;
 
+    // 카메라 대상사이 거리 5 ~ 60
     public float distance = 5.0f;
+    // 줌속도
     public float zoomSpeed = 4f;
     public float minZoom = 5f;
     public float maxZoom = 15f;
+    // x, y출 회전 속도
     public float xSpeed = 120.0f;
     public float ySpeed = 120.0f;
     public float yMinLimit = -20f;
@@ -44,6 +44,7 @@ public class CameraController : MonoBehaviour
                 return;
             }
 
+            // 마우스 왼쪽버튼 눌렀을때
             if (Input.GetMouseButton(0))
             {
                 x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
@@ -52,6 +53,7 @@ public class CameraController : MonoBehaviour
                 y = ClampAngle(y, yMinLimit, yMaxLimit);
             }
 
+            // 스크롤 했을때
             // Adjust zoom independent of mouse button being down
             distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * zoomSpeed, minZoom, maxZoom);
 

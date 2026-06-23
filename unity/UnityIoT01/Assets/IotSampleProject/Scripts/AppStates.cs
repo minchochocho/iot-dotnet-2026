@@ -1,12 +1,8 @@
 using IndustryCSE.IoT;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.UI;
-
 using TMPro;
+using UnityEngine;
 
-public class AppStates : MonoBehaviour
-{
+public class AppStates : MonoBehaviour {
     // Serialized fields for UI elements and objects
     [SerializeField] private TMP_Text labelOverlay;
     [SerializeField] private TMP_Text labelApplicationMode;
@@ -15,66 +11,71 @@ public class AppStates : MonoBehaviour
 
     [SerializeField] private TMP_Text messageDisplay;
 
-    // Toggles for different application states
-    private bool _showOccupancy;
-    private bool _showHVAC;
-    private bool _showRoomOccupancy;
+    // 앱 상태 토글하는 불리언 함수
+    private bool _showOccupancy;            // 좌석점유상태 표시
+    private bool _showHVAC;                 // HVAC(공조기) 표시
+    private bool _showRoomOccupancy;        //
     private bool _showRoomTemperature;
     private bool _showLocator;
 
     private string _msgInfoString;
 
-    // Cached components for performance
-    private BaseDevice[] _baseDevices;
-    private BaseMessageProvider[] _messageProviders;
+    // 성능을 위해 캐싱된 컴포넌트 배열
+    private BaseDevice[] _baseDevices;      // 화면내 모든 IoT디바이스 컴포넌트
+    private BaseMessageProvider[] _messageProviders;    // 메시지 공급자 컴포넌트
 
+    [System.Obsolete]
     private void Start()
     {
         Debug.Log("AppStates checking for devices");
-        // Cache devices and message providers at the start for better performance
-        _baseDevices = Object.FindObjectsByType<BaseDevice>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        _messageProviders = Object.FindObjectsByType<BaseMessageProvider>(FindObjectsSortMode.None);
-
-        SubscribeMessageBus();
+        // 성능 최적화용 디바이스, 메시지 캐싱
+        // 파라미터 2개짜리 메서드는 Obsolete
+        _baseDevices = Object.FindObjectsByType<BaseDevice>(FindObjectsInactive.Include);
+        // FindObjectsSortMode.None 파라미터 받는 메서드는 Obsolete
+        // _messageProviders = Object.FindObjectsByType<BaseMessageProvider>(FindObjectsSortMode.None);
+        _messageProviders = Object.FindObjectsByType<BaseMessageProvider>();
+        SubscribeMessageBus();  // 메시지 구독 시작
     }
 
     private void Update()
     {
+        // 메시지 컨테이너가 활성화상태일때 메시지 업데이트
         if (messageContainer.activeSelf)
         {
             messageDisplay.text = _msgInfoString;
         }
-    } 
+    }
 
     #region Toggle Methods
     public void ToggleOccupancy()
     {
         _showOccupancy = !_showOccupancy;
-        SetState("Seating Occupancy", _showOccupancy, IndustryCSE.IoT.DeviceType.Type.Occupancy);
+        SetState("좌석 사용여부", _showOccupancy, IndustryCSE.IoT.DeviceType.Type.Occupancy);
     }
 
     public void ToggleHVAC()
     {
         _showHVAC = !_showHVAC;
-        SetState("HVAC", _showHVAC, IndustryCSE.IoT.DeviceType.Type.Thermostat);
+        SetState("HVAC(공조기)", _showHVAC, IndustryCSE.IoT.DeviceType.Type.Thermostat);
     }
 
     public void ToggleRoomOccupancy()
     {
         _showRoomOccupancy = !_showRoomOccupancy;
-        SetState("Room Occupancy", _showRoomOccupancy, IndustryCSE.IoT.DeviceType.Type.OccupancyDeviceGroup);
+        SetState("방 사용여부", _showRoomOccupancy, IndustryCSE.IoT.DeviceType.Type.OccupancyDeviceGroup);
     }
 
     public void ToggleRoomTemperature()
     {
         _showRoomTemperature = !_showRoomTemperature;
-        SetState("Room Temperature", _showRoomTemperature, IndustryCSE.IoT.DeviceType.Type.ThermostatDeviceGroup);
+        SetState("방 온도/기기 현황", _showRoomTemperature, IndustryCSE.IoT.DeviceType.Type.ThermostatDeviceGroup);
     }
 
+    // 로케이트 버튼을 클릭하면 토클
     public void ToggleLocate()
     {
         _showLocator = !_showLocator;
-
+        // 메시지컨테이너 활성화 토클(_showLocator가 true면 활성화, false면 비활성화)
         messageContainer.SetActive(_showLocator);
     }
 
@@ -142,7 +143,7 @@ public class AppStates : MonoBehaviour
         }
     }
     #endregion
-    
+
     private void SubscribeMessageBus()
     {
         if (IotDeviceMessageReader.Instance != null)

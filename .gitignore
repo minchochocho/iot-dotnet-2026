@@ -699,3 +699,10 @@ UserSettings/
 *.tiff
 *.mov
 *.mp4
+
+# --- M2MqttUnity accidental nested project cleanup ---
+unity/UnityIoT02/Assets/M2MqttUnity/Library/
+unity/UnityIoT02/Assets/M2MqttUnity/Logs/
+unity/UnityIoT02/Assets/M2MqttUnity/Packages/
+unity/UnityIoT02/Assets/M2MqttUnity/ProjectSettings/
+unity/UnityIoT02/Assets/M2MqttUnity/UserSettings/

@@ -1,11 +1,10 @@
-using UnityEngine;
-using UnityEngine.AI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class PathWalker : MonoBehaviour
-{
+public class PathWalker : MonoBehaviour {
     public List<Transform> waypoints = new List<Transform>();
     private NavMeshAgent agent;
     private int currentDestinationIndex = -1;
