@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using WebApplication2.Models;
+
 namespace WebApplication2 {
     public class Program {
         public static void Main(string[] args)
@@ -7,6 +10,14 @@ namespace WebApplication2 {
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            // 데이터베이스 매핑, appsettings.json에 작성한 연결문자열명
+            var conn = builder.Configuration.GetConnectionString("BookRentalShopConnection");
+
+            // Models.AppDbContext.cs 내용을 매핑
+            builder.Services.AddDbContext<MySqlDbContext>(options =>
+            {
+                options.UseMySql(conn, ServerVersion.AutoDetect(conn));
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

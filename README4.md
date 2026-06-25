@@ -283,7 +283,7 @@ public static void Main(string[] args)
     // 개발환경일때 처리영역
     if (!app.Environment.IsDevelopment())
     {
-        app.UseExceptionHandler("/Error");  // 예외페이지 보이기
+        app.UseExceptionHandler("/Home/Error");  // 예외페이지 보이기
         app.UseHsts();  // 보안프로토콜 https 강제 실행
     }
 
@@ -292,13 +292,249 @@ public static void Main(string[] args)
     app.UseAuthorization(); // 권한 검사
 
     app.MapStaticAssets();  // wwwroot(정적파일) 사용하겠다는 설정
-    app.MapRazorPages()
-       .WithStaticAssets();
 
-    app.Run();
+    // ! 가장 중요
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}")
+        .WithStaticAssets();
+
+    app.Run();  // 웹서버 실행
 }
-
 ```
+
+- URL 규칙(라우팅)
+    - `{controller=Home}/{action=Index}/{id?}` == `{controller}/{action}/{id?}`
+    - Home/Index/3 --> https://localhost:port/Home/Index/3
+    - HomeController 클래스에 Index 액션 메서드에 파라미터를 3을 넣어서 실행하라는 의미
+
+- Controller - HomeController.cs 
+    - Home 뒤에 Controller는 실행 시 무시
+
+    ```cs
+    public class HomeController : Controller{
+        public IActionResult Index(){
+            // Views > Home > Index.cshtml 을 리턴(보여달라)
+            return View();
+        }
+    ```
+
+- Views - 화면 영역
+    ![alt text](image-164.png)
+
+    - Home 폴더 - HomeController에서 사용하는 View
+        - Index.cshtml - HomeController 내 Index() 액션 메서드
+        - `return View();` 에서 Index.cshtml을 렌더링해서 리턴
+        - html 전체 소스는 없음. `main 화면 영역`만 존재
+
+    - Shared 폴더 - 모든 View가 함께 공유하는 공통화면
+        - _Layout.cshtml - 웹사이트 공통화면 틀. `html의 전체 소스` 포함
+        - 유지보수를 편하게 하기 위해
+
+        ```html
+        <main role="main" class="pb-3">
+            <!-- Index.cshtml / Pruvacy.cshtml 포함시키는 부분 -->
+            @RenderBody()
+        </main>
+        ```
+
+        - _ValidationScriptsPartial.cshtml - 폼 입  력값 검사 Javascript 영역
+        - Error.cshtml - 예외발생 리턴 화면
+        - _ViewImports.cshtml - 모든 View에 공통으로 사용하는 설정파일
+        - _ViewStart.cshtml - 모든 View가 시작하기전에 실행하는 파일
+
+    ![alt text](image-165.png)
+
+    - _Layout.cshttml 내 태그가 일반 태그와 asp.net 태그로 구분
+        - 각 태그 내부 속성에 asp- 시작하는 속성이 포함
+        - `asp-area`, `asp-controller`, `asp-action`, ... - ASP.NET에서 HTML을 백엔드와 연결하기 위해 만든 태그
+        - `asp-controller="Home" asp-action="Index"` - HomeController의 Index 액션메서드 실행
+    
+- Hot Reload - 웹 실행 중 수정사항을 곧바로 반영해서 확인할 때 사용
+    - 프론트엔드를 변경시는 반영. C# 백엔드를 수정했을 때는 재시작 해야함
+
+    ![alt text](image-166.png)
+
+#### 시멘틱웹 태그 리스트
+
+- HTML 기본외 화면 구성을 위해 추가로 만든 구역탭
+- 웹 페이지를 구성할 때 단순히 디자인만을 위해 태그를 사용하는 것이 아니라, 개발자가 의도한 요소의 역할과 의미가 명확하게 드러나도록 작성하는 방식
+- 모든 화면에 구성되는 동일한 영역을 구역으로 나눔
+- `<div>` 태그로 대체 가능
+
+| 태그 | 설명 |
+| --- | ---|
+| `<header>` | 머리글을 담당하는 영역 태그 |
+| `<main>` | 주요 내용 표시 영역태그 |
+| `<footer>` | 회사명이나 Copyright를 출력하는 영역태그 |
+| `<nav>` | 웹페이지 메뉴표시 영역태그 |
+| `<content>` | main 내에 컨텐츠 영역태그 |
+
+#### ASP.NET Core 메뉴/기능 추가
+
+1. Controller 폴더 > Context Menu > 추가 > 컨트롤러
+
+    ![alt text](image-167.png)
+
+    ![alt text](image-168.png)
+
+2. BoardController.cs, Index() 액션메서드 > Context Menu > 뷰 추가 
+    ![alt text](image-169.png)
+
+    ![alt text](image-170.png)
+
+    ![alt text](image-171.png)
+
+3. _Layout.cshtml에 메뉴 추가
+
+    ```html
+        <li class="nav-item">
+            <a class ="nav-link text-dark" asp-area=""
+            asp-controller="Board" asp-action = "index">게시판</a> 
+        </li>
+    ```
+
+4. Board > Index.cshtml 편집
+
+![alt text](image-172.png)
+
+#### DB 핸들링
+
+- MySQL bookrentalshop 연동
+- MySQL Connector 대신 EntityFramework Core 사용
+
+1. NuGet 패키지 설치
+    - EntityFramework는 Major 버전 숫자가 일치해야 함
+    - Pomelo...와 Microsoft... 버전 맞추기
+    - Microsoft.EntityFrameworkCore `9.0.17`
+    - Microsoft.EntityFrameworkCore.Tools `9.0.17`
+    - Pomelo.EntityFrameworkCore.MySql `9.0.0`
+
+2. appsettings.json
+    - 연결문자열 추가
+    ```json
+    "Server=localhost;
+    Port=3306;
+    Database=bookrentalshop;
+    User Id=root;
+    Password=my123456;
+    Charset=utf8m4;"
+    ```
+
+3. Model 만들기 - NuGet 콘솔 명령어 생성 vs 직접 코딩
+    - Book.cs 생성 - [소스](./webapp/WebApplication2/WebApplication2.slnx)
+
+4. DbContext 생성 - EF에서 매핑사용할 Db집합 구성
+    - AppDbContext.cs 작성 - [소스](./webapp/WebApplication2/WebApplication2/Models/MySqlDbContext.cs)
+
+5. Program.cs DB로직 추가 - builder 객체에 연결
+    - DB연결 문자열, DbContext를 연결 - [소스](./webapp/WebApplication2/WebApplication2/Program.cs)
+
+5. Controller 생성 - Db와 연결할 컨트롤러
+    - BooksController.cs 생성 -  [소스](./webapp/WebApplication2/WebApplication2/Controllers/BoardController.cs)
+    
+6. Controller 생성 - Db와 연결할 컨트롤러
+    - context menu > 추가 > 컨트롤러
+
+    ![alt text](image-173.png)
+
+    ![alt text](image-174.png)
+
+    - 데이터베이스 공급자 문제, MySQL 없어서 SQL Server 관련 설정 자동 추가
+    - NuGet 패키지 버전 변경, appsettings.json 연결문자열 삭제
+
+7. _Layout.cshtml 메뉴 추기
+
+8. 오류사항
+    - Book`s` Controller -> BookController 모델명에 s를 사용하지 말것
+    - Routing URL에서 /controller/action/id? 인데 MySQLKey값이 book_idx. id와 매핑 불가. book_idx -> id로 변경
+    - DB모델링 시 PK 이름을 id로 고정할 것
+    - BookController.cs에 메서드 파라미터 bookidx -> id로 변경. Ctrl+H 변경할 때 대소문자 구분 클릭.
+
+9. 현재 웹개발 DB연동 기술
+    - ASP.NET Core - EntityFrameworkCore
+    - SpringBoot(Java) - JPA
+    - 실무에서 아주 많이 쓰이지는 않음
+
+#### HTTP 메서드
+
+웹브라우저(클라이언트)와 서버가 데이터를 주고받는 대표적인 HTTP 메서드 ()
+
+- GET : 데이터를 가져올때 사용
+    - URL로 요청
+        - https://localhost:port/Book/Detail/7
+        - https://apis.data.go.kr/idnum/servicename/getFestivalKr?serviceKey=servicekey&pageNo=1&numOfRows=10&resultType=json
+    - 데이터 노출위험, 길이제한 단점. 일반적인 요청방식
+
+- POST : 데이터 처리를 수행/변경/삭제시 사용
+    - URL에 데이터를 붙이지 않고, 눈에 보이지 않는 HTTP body에 데이터를 숨겨서 전송
+    - submit 타입버튼 클릭했을 때 실행 또는 submit을 수동으로 발생시킬때
+    - 데이터 노출위험 적음, 길이제한 없음. 일반적인 데이터처리 방식
+
+### ASP.NET Core RESTAPI
+
+- 웹페이지 화면없이 데이터만 서비스 형태
+- 웹페이지는 다른 웹/앱기술로 개발가능
+    - Node.js, React, WPF, 안드로이드 등 여러 앱을 개발
+- 데이터포털에서 OpenAPI 서비스와 같은 웹서비스 구축
+
+#### product 테이블 생성
+
+- testdb 데이터베이스에 product 생성
+
+```sql
+-- 테이블
+CREATE TABLE products (
+    product_id INT NOT NULL AUTO_INCREMENT,
+    product_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NULL,
+    price DECIMAL(10,0) NOT NULL,
+    stock INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (product_id)
+);
+
+-- 더미데이터
+INSERT INTO products(product_name, category, price, stock)
+VALUES
+('무선 마우스', '전자기기', 55000, 30),
+('기계식 키보드', '전자기기', 89000, 15),
+('텀블러', '생활용품', 18000, 50),
+('노트북 거치대', '사무용품', 32000, 20),
+('핸드폰 충전기', '전자기기', 18000, 10);
+```
+
+#### ASP.NET Core Web API 프로젝트 생성
+
+- ASP.NET Core 웹 API 템플릿 선택
+- OpenAPI 지원 사용, 컨트롤러 사용 체크 만들기, 나머지는 동일
+- wwwroot(js, css정적파일), Views 폴더 없음
+- Models 폴더는 직접 생성 
+
+![alt text](image-175.png)
+
+#### POSTMan 설치
+
+- https://www.postman.com/downloads/
+
+![alt text](image-176.png)
+
+#### MySqlConnector NuGet 패키지 설치
+
+- NuGet 패키지 관리자 > MySqlConnector 검색 후 설치
+
+#### Product 모델 클래스 생성
+
+- Models > Product.cs 생성 - [소스](./webapp/WebApiSolution/ProductApi/Models/Product.cs)
+
+#### DB 연결 구성
+
+- appsettings.json 연결문자열 추가 - [소스](./webapp/WebApiSolution/ProductApi/appsettings.json)
+- Program.cs 연결변수 추가 - [소스](./webapp/WebApiSolution/ProductApi/Program.cs)
+
+
+
+#### ProductsController 생성
 
 ## 4. 웹 실습 프로젝트
 
