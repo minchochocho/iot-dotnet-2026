@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS 학습</title>
+    <link rel="stylesheet" href="./site.css">
+    <script>
+        /* 여러줄 주석 */
+        // alert("Hello, JavaScript!"); // 한줄 주석
+    </script>
+</head>
+<body>
+    <h2>Javascript 학습</h2>
+
+    <script>
+        let name = "홍길동";
+        let age = 30;
+
+        console.log(name);
+        console.log(age);
+        alert(name + " " + age);    // alert로도 가능
+    </script>
+
+    <script>
+        // 연산자 - Pass! 나머지 프로그래밍 언어와 동일
+        let a = 10;
+        let b = 3;
+
+        console.log(a % b); // 1
+    </script>
+
+    <script>
+        if(age>=19){
+            console.log("성인");
+        }else{
+            console.log("미성년자");
+        }
+    </script>
+
+    <script>
+        // 반목문 for, while
+        let c = 1;
+        // while(1){
+        //    console.log(c);    
+        //}
+        for(let i=0;i<=5;i++){
+            console.log(i);
+        }
+    </script>
+
+    <script>
+        //함수
+        function add(a,b){
+            return a+b;
+        }
+
+        let result = add(a,b);
+        console.log(result);
+
+        // 익명함수, lamdba 함수
+    </script>
+
+    <script>
+        //배열
+        let fruits =[
+            '애플망고',
+            "사과",
+            "바나나"
+        ];
+        console.log(fruits);
+    </script>
+
+    <script>
+        // 객체(Object) --> JSON
+        let student = {
+            name:"홍길동",
+            age:30,
+            scrore: 90,
+            graduated : false
+        }
+    </script>
+
+</body>
+</html>
