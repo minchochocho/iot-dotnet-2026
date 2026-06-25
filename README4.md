@@ -267,6 +267,39 @@ Microsoft에서 개발한 크로스 플랫폼 웹 개발 프레임워크
 
 ![alt text](image-163.png)
 
+- Program.cs 
+```cs
+public static void Main(string[] args)
+{
+    // ASP.NET 가장 중요객체. 설정, 로깅, 환경변수등으로
+    // 실행할 웹 서버 빌더 생성 역할
+    var builder = WebApplication.CreateBuilder(args);
+
+    // 서비스 등록. MVC 패턴에 필수
+    builder.Services.AddRazorPages();
+
+    var app = builder.Build();  // 웹앱 생성
+
+    // 개발환경일때 처리영역
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Error");  // 예외페이지 보이기
+        app.UseHsts();  // 보안프로토콜 https 강제 실행
+    }
+
+    app.UseHttpsRedirection();  // https로 변환
+    app.UseRouting();       // 라우팅활성화
+    app.UseAuthorization(); // 권한 검사
+
+    app.MapStaticAssets();  // wwwroot(정적파일) 사용하겠다는 설정
+    app.MapRazorPages()
+       .WithStaticAssets();
+
+    app.Run();
+}
+
+```
+
 ## 4. 웹 실습 프로젝트
 
 ### IoT 스마트홈 통합 플랫폼
