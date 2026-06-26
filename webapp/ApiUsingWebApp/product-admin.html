@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>제품 관리</h2>
+
+        <div>
+            <button class="btn btn-secondary" onclick="loadProducts()">새로고침</button>
+            <button class="btn btn-primary">상품등록</button>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover bg-white">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>상품명</th>
+                <th>카테고리</th>
+                <th>가격</th>
+                <th>재고</th>
+                <th>등록일</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody id="productTableBody">
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    const API_URL = "http://localhost:5151/api/products";
+
+    async function loadProducts() {
+        const response = await fetch(API_URL);
+        const products = await response.json();
+
+        const tbody = document.getElementById("productTableBody");
+        tbody.innerHTML = "";
+
+        products.forEach(product => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${product.productId}</td>
+                    <td>${product.productName}</td>
+                    <td>${product.category ?? ""}</td>
+                    <td>${Number(product.price).toLocaleString()}원</td>
+                    <td>${product.stock}</td>
+                    <td>${product.createdAt}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning">수정</button>
+                        <button class="btn btn-sm btn-danger">삭제</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    loadProducts();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+</body>
+</html>
