@@ -1,0 +1,38 @@
+# 웹 통합 토이 프로젝트
+
+## 국가교통정보센터 CCTV 정보 앱 
+
+## 개요
+
+국가교통정보센터에서 제공하는 OpenAPI를 통합해서 운영하는 RESTAPI서비스와 모니터링 앱 통합개발
+
+### 사용기술
+
+- C# 14(.NET 10.0)
+- WPF
+- OpenAPI 사용 + Wrapping RESTAPI 서비스
+- ProgressBar?
+- Newtonsoft.json
+- ITS 국가교통정보센터 OpenAPI - [링크](https://www.its.go.kr/)
+- MahApps.Metro? - 
+
+### 개발환경 설정
+
+#### 국가교통정보센터 사이트 회원가입
+
+##### 로그인 후 인증키 신청
+
+- 오픈데이터 > 오픈데이터 목록 > CCTV 화상자료
+- 인증키 신청 버튼
+
+![alt text](image-229.png)
+
+![alt text](image-228.png)
+
+##### 마이페이지 확인
+
+![alt text](image-230.png)
+
+#### Visual Studio
+
+##### 프로젝트 생성

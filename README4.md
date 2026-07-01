@@ -422,7 +422,7 @@ public static void Main(string[] args)
     ```
 
 3. Model 만들기 - NuGet 콘솔 명령어 생성 vs 직접 코딩
-    - Book.cs 생성 - [소스](./webapp/WebApplication2/WebApplication2.slnx)
+    - Book.cs 생성 - [소스](./webapp/WebApplication2/WebApplication2/Models/Book.cs)
 
 4. DbContext 생성 - EF에서 매핑사용할 Db집합 구성
     - AppDbContext.cs 작성 - [소스](./webapp/WebApplication2/WebApplication2/Models/MySqlDbContext.cs)
@@ -431,7 +431,7 @@ public static void Main(string[] args)
     - DB연결 문자열, DbContext를 연결 - [소스](./webapp/WebApplication2/WebApplication2/Program.cs)
 
 5. Controller 생성 - Db와 연결할 컨트롤러
-    - BooksController.cs 생성 -  [소스](./webapp/WebApplication2/WebApplication2/Controllers/BoardController.cs)
+    - BooksController.cs 생성 -  [소스](./webapp/WebApplication2/WebApplication2/Controllers/BookController.cs)
     
 6. Controller 생성 - Db와 연결할 컨트롤러
     - context menu > 추가 > 컨트롤러
@@ -688,7 +688,7 @@ VALUES
 
 ![alt text](image-188.png)
 
-#### WPF
+#### WPF 1
 
 - 공공데이터포털 부산축제정보 앱 WPF 활용
 - 부산축제정보 앱 다운사이징 코딩
@@ -707,22 +707,341 @@ VALUES
 
 - HTML + Javascript 에서 추가된 데이터 확인 화면
 
+#### 현재 상품등록 문제
+
+- 입력 Validation Check 구현되어 있지 않음
+
+- ""(empty)는 null이 아니기 때문에 데이터 등록 됨
+
+- 데이터베이스에 빈 데이터 입력확인
+
+- 데이터 입력 시 무조건(!) 입력 검증 로직 필요
+
 #### WPF 2
 
-- PUT, DELETE 기능 구현
+![alt text](image-192.png)
+
 - Validation Check, Exception Handling 추가
+- 수정(PUT), 삭제(DELETE) 기능 구현
+
+#### 디자인 렌더링 오류
+
+![alt text](image-193.png)
+
+- xaml 파일을 복사한 뒤 클래스명이 중복되어서 발생
+- 새로 만든 xaml 파일의 클래스명을 전부 수정
+
+![alt text](image-194.png)
+
+#### 현재 구현의 문제
+
+- ProductCreateWindow.xaml와 ProductEditWindow.xaml 가 존재
+- DB 설계 상 새로운 컬럼이 추가되면 두 화면을 모두 수정
+- 하나의 윈도우로 개발하면 한 화면만 수정의 효율성
+- ProductCreateWindow.xaml,ProductEditWindow.xaml -> ProductWindow.xaml 로 통합
+- 각 창의 필수기능, BtnSave 버튼 주요 로직만 조건에 따라 합치기
+
+```cs
+if (_product is null) { // 신규 생성. ProductCreateWindow BtnSave 기능
+    Product product = new Product {
+        ProductName = TxtProductName.Text.Trim(),
+        Category = TxtCategory.Text.Trim(),
+        Price = Convert.ToDecimal(NudPrice.Value),
+        Stock = Convert.ToInt32(NudStock.Value)
+    };
+
+    bool result = await service.PostProductAsync(product);  // 서비스에 메서드 추가
+
+    if (result) {
+        await this.ShowMessageAsync("저장", "상품이 등록되었습니다.");
+        DialogResult = true;
+        Close();
+    } else {
+        await this.ShowMessageAsync("저장", "상품 등록이 실패했습니다.");
+    }
+} else { // 수정. ProductEditWindow BtnSave 기능
+    // 이전 원본 객체를 수정
+    _product.ProductName = TxtProductName.Text.Trim();
+    _product.Category = TxtCategory.Text.Trim();
+    _product.Price = price;
+    _product.Stock = stock;
+
+    bool result = await service.UpdateProductAsync(_product);
+
+    if (result) {
+        await this.ShowMessageAsync("저장", "상품이 수정되었습니다.");
+        DialogResult = true;
+        Close();
+    } else {
+        await this.ShowMessageAsync("저장", "상품 수정에 실패했습니다.");
+    }
+}
+```
+
+##### 결론
+
+![alt text](image-195.png)
+
+- 기존 방식 - WPF에 DB 핸들링위해서 SQL 처리, 웹개발(ASP.NET 포함)때도 DB 핸들링 SQL 처리 필요
+- REST API 방식 - DB 핸들링은 REST API 서비스에서 통합개발. 각 클라이언트에서는 서비스URL 호출(요청)으로 데이터를 처리
+
+### Unity + RESTAPI 애플리케이션
+
+- Unity URP 프로젝트 생성
+
+#### Newtonsoft Json 패키지 설치
+
+- Window > Package Manger > + Add package by technical name > 
+    - `com.unity.nuget.newtonsoft-json` 입력 후 Install
+
+![alt text](image-196.png)
+
+#### Canvas UI 추가
+
+- Canvas 추가. 2D변경 
+- Button 추가 -> BtnLoad
+- 나눔고딕 폰트 추가, 이전 파일 그대로 사용
+
+![alt text](image-197.png)
+
+- Text - TextMeshPro 추가 -> Logs 
+
+#### Script 작성
+
+- ProductApiClient.cs 생성 
+
+```cs
+public class ProductApiClient : MonoBehaviour {
+    [SerializeField]
+    private TMP_Text txtLog;
+
+    [SerializeField]
+    private string serviceUrl = "http://localhost:5276/api/products";
+
+    public void LoadProducts() {
+        StartCoroutine(GetProducts());
+    }
+
+    private IEnumerator GetProducts() {
+        using UnityWebRequest request = UnityWebRequest.Get(serviceUrl);
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success) {
+            txtLog.text = request.error;
+            yield break;
+        }
+
+        txtLog.text = request.downloadHandler.text;
+    }
+}
+```
+
+#### GameObject 연결
+
+- 빈 객체 -> ProductApiManager 생성
+- ProductApiClient 스크립트를 하위 컴포넌트 등록
+- TxtLog 변수에 캔버스에 추가한 Logs 텍스트 할당
+
+![alt text](image-198.png)
+
+- BtnLoad OnClick 이벤트 추가
+
+![alt text](image-199.png)
+
+- 스크립트의 부모 객체 ProductApiManager를 기본으로 선택
+- 실제 사용함수는 ProdctApiClient.LoadProduct() 선택
+
+#### 실행화면
+
+![alt text](image-200.png)
+
+- API 서버 중지시 화면
+
+![alt text](image-201.png)
+
+- API 서버 정상동작 화면
+
+![alt text](image-202.png)
+
+- WPF에서 데이터 등록 후 Unity에서 재확인
+
+#### 데이터 리스트화면(2D) 만들기
+
+![alt text](image-203.png)
+
+- 화면 구조
+
+![alt text](image-204.png)
+
+- Panel - HeaderPanel, ButtonPanel, DataGridHeader
+- TMPro - HeaderTitle, Lbl~ 6개
+- Button - BtnLoad
+- ScrollView
+
+- Product.cs 스크립트 생성 - [소스](./unity/UnityProductApp/Assets/Scripts/Product.cs)
+
+#### ProductRow 프리팹
+
+![alt text](image-205.png)
+
+- ProductRow 객체 생성, UI 구성
+
+![alt text](image-206.png)
+
+- Prefabs 폴더 드래그, 프리팹 생성
+
+- ProductRowUi.cs 스크립트 생성
+
+- ProductRow 프리팹 더블클릭 > 프리팹 에디터 화면 전환
+- ProductRowUi.cs 를 ProductRow root 객체 할당
+
+![alt text](image-207.png)
+
+#### ProductApiClient 스크립트 수정
+
+- 스크롤뷰 컨텐츠, ProductRow 프리팹 할당 추가 - [소스](./unity/UnityProductApp/Assets/Scripts/ProductApiClient.cs)
+
+#### ProductApiManager 아래 스크립트
+
+- ProductApiClient 스크립트에 Content, Product Row 프리팹 할당
+
+![alt text](image-208.png)
+
+#### 실행결과
+
+![alt text](image-209.png)
+
+- 컨텐츠 아래 첫번째 줄에 모두 겹쳐져서 출력
+
+#### 프리팹 및 컨텐트 수정
+
+- ProductRow 프리팹 오픈
+- Add Component > Layout Element 추가
+- Min Height, Preferred Height 36 지정
+- Flexibl Height 0 지정
+
+- View port > cotent 클릭
+
+![alt text](image-210.png)
+
+#### 실행결과
+
+![alt text](image-211.png)
+
+- WPF에서 신규 데이터 입력
+
+![alt text](image-213.png)
+
+- Unity에서 신규 데이터 확인
+
+![alt text](image-214.png)
+
+
+## 4. ASP.NET Core 도커
+
+- 웹서비스를 도커 이미지로 만든 뒤 도커에서 실행하는 방법
+- MSA(MicroService Architecture) 서비스를 만들때 효율적
+
+- ![](image-226.png)
+
+#### 도커
+- `Linux 컨테이너(기본)`와 Windows 컨테이너로 구분 : 둘 사이 전환(switch) 가능
+- `Linux 컨테이너` - WSL(Window Subsystem for Linux)
+- Windows 컨테이너 - Hyper-v 필수
+
+![alt text](image-218.png)
+
+![alt text](image-219.png)
+
+- Windows 컨테이너 상태 : 컨테이너 없음
+
+![alt text](image-220.png)
+
+- Linux 컨테이너 상태 : MySQL 컨테이너 있음.
+
+- ASP.NET Core는 컨테이너 두개를 모두 지원(Linux가 편함)
+
+#### 기존 프로젝트 Docker 지원 추가
+
+- appsettings.json 오픈. server localhost를 해당 아이피 주소로 변경(!)
+- 프로젝트 > Context menu > 컨테이너 지원 선택
+
+![alt text](image-215.png)
+
+![alt text](image-221.png)
+
+![alt text](image-217.png)
+
+- DockerFile 생성 - 도커 이미지 생성을 위한 구성 파일
+
+```dockerfile
+# Base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+# Build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish 
+
+# Final
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:8080
+ENTRYPOINT ["dotnet", "ProductApi.dll"]
+```
+
+- 이미지 만들기
+```powershell
+docker build -t productapi .
+```
+
+![alt text](image-224.png)
+
+- 빌드 진행상황
+
+![alt text](image-223.png)
+
+- 이미지 생성 확인
+
+- 컨테이너 실행 - MySQL 80 이미지 실행과 거의 동일
+
+```powershell
+docker run -d --name productapi-container -p 8080:8080 productapi
+```
+
+- 컨테이너 실행화면
 
 
 
-#### Unity
+- 도커에서 실행되는 웹서비스 화면
 
-#### ASP.NET Core MVC
+![alt text](image-225.png)
+
+- 디버깅용 도커 설치확인
+
+- 주의점! 
+    - localhost 사용안됨. 서비스중 아이피 주소로 변경
+    - 도커 컨테이너 실행여부 확인
+    - 유니티의 경우 HTTP 접속 허용
 
 
+#### DevOps
 
-#### ProductsController 생성
+- Develoment + Operation - 개발과 운영을 하나의 프로세스로 연결. 소프트웨어 개발과 배포하는 문화 방법론
 
-## 4. 웹 실습 프로젝트
+- 개발 > Git 저장 > 자동빌드 > DOcker 이미지(Docker Hub)
+
+
+- 도커에서 실행되는 웹서비스 화면
+
+
+## 5. 웹 실습 프로젝트
 
 ### IoT 스마트홈 통합 플랫폼
 
@@ -736,4 +1055,4 @@ VALUES
 
 ### AI 비전 검사 시스템
 
-#### 실시간 채팅 시스템 + 챗봇 기능
+### 실시간 채팅 시스템 + 챗봇 기능

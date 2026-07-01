@@ -7,7 +7,8 @@ using WpfProductAdmin.Models;
 
 namespace WpfProductAdmin.Services {
     public class ApiService {
-        private const string BaseUrl = "http://localhost:5151/api/products";
+        // private const string BaseUrl = "http://localhost:5151/api/products";    // 최초 개발용 API
+        private const string BaseUrl = "    ";    // 도커배포 API
 
         public async Task<ObservableCollection<Product>> GetProductsAsync()
         {
