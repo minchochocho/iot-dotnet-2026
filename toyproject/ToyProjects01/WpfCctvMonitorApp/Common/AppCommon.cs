@@ -9,7 +9,7 @@
 
         public static string RoadType = "ex"; // ex는 고속도로, its는 국도  // 나중에 수정예정
 
-        public static string GetType { get; set; } = "json";
+        public static new string GetType { get; set; } = "json";
         public static string CctyType { get; set; } = "1";  // 1: HLS, 2: mp4, 3: 정지영상, 4: HLS(https), 5: mp4(https) 2~5는 사용x(필요없음)
 
         // 대한민국 지도 영역
@@ -84,6 +84,18 @@
 
             ["제주"] = new GeoBound(33.1000, 33.6000, 126.1000, 126.9500)
         };
+
+        // 글자 길이가 너무 길면 생략하는 메서드
+        public static string Ellipsis(string text, int maxLenth = 100)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;    // ""
+
+            if (text.Length <= maxLenth)
+                return text;
+
+            return text[..maxLenth] + "...";    // text[..maxLenth] 
+        }
 
     }
 

@@ -64,6 +64,12 @@ VideoLAN Organization에서 제공하는 크로스 플랫폼 멀티미디어 재
 
 - Newtonsoft.Json
 - LibVLCSharp.WPF
+- VideoLAN.LibVLC.Windows
+- WebView2
+
+![alt text](image-240.png)
+
+- C, C++로 만들면 어셈블리로 올라감
 
 ### 화면 UI
 
@@ -159,29 +165,132 @@ type `실시간`, 동영상, 정지영상 모두 같은 CCTV를 표현하는 방
 
 - 도로구분 선택, 지역 선택 후 검색. CCTV 리스트 갯수 출력
 
-##### CCTV 목록 사용자컨트롤
+##### CCTV 목록아이템 템플릿
+
+- ListBox 일반 ListBoxItem을 ListBox.ItemTemplate으로 변경
+- 데이터 바인딩 {Binding CctvName}
+
+![alt text](image-238.png)
+
+- 국도 선택, 부산 선택 후 검색 결과
 
 ##### 리스트뷰 클릭 스트리밍
 
+- 클릭이벤트 생성 메시지창 출력
+
+![alt text](image-239.png)
+
+- LibVLCsharp.WPF에 전달 스트리밍 플레이
+
 ##### 지도표시
+
+- CefSharp(Chrominum) 웹브라우저는 설치용량이 큼
+- WebView2(Edge runtime) 이 상대적으로 용량 적음
+- 브라우저 기능 전체 사용이 아인 지도표시만 하면 WebView가 좋음
+
+```xml
+<Window x:Class="WpfCctvMonitorApp.MainWindow"
+        ...
+        xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        ...>
+        ...
+        <wv2:WebView2 x:Name="WvwMap"/>
+        ...
+```
+
+- 리스트뷰 상세 미리보기
+
+- 초기화 로직
+
+![alt text](image-242.png)
+
+- 리스트뷰 아이템 클릭 시 상세지도 마커표시
+
+![alt text](image-241.png)
 
 ##### CCTV 상세정보
 
+- CctvInfo 내용을 출력
+- TextBlock에서 Text 속성에 할당
+
 ##### 상태표시줄 작업
 
-##### 즐겨찾기 DB 추가
+- 선택CCTV - CCTVName 그대로 사용
+- 영상URL - 전체 표시X, 일부만 표시
+- 연결상태 - 리스트박스 아이템 선택 후 스트리밍 상태에 따라 변경
+    - `스트리밍 안되는데 Play결과 true (?)`
+- 마지막 업데이트 - ?
 
-##### 즐겨찾기 읽어오기
+##### 종료시 메모리 해제
 
-##### 프로그래스바
+- 메모리 누수 발생 가능성 제거
+- OnClosed() 이벤트 객체 해제로직 추가
 
-##### 전체 검색 개수
+##### 예외처리
 
-- 6000개?
+- [x] 지역선택없이 검색하면 프로그램 종료
+- [ ] API Key 누락되었을 때
+- [ ] VLC 재생 실패 감지
+
+##### 최초 로드시 화면 텍스트 초기화
+
+- CCTV 목록 (총 125건)
+- 연결 상태 : 정상
+- 선택 CCTV : 경부선 ....
+- 영상 URL : ...
+
+
+##### 리펙토링
+
+- 프로그램 기능은 그대로 유지하면서 내부 구조를 더 좋게 개선
+    - 중복코드 제거
+    - 메서드 소스를 하위메서드 생성으로 간결화
+    - 하드코딩 제거
+    - 로직 효율화
+
+- Visual Studio에서 `Ctrl + .` / **Alt + Enter**로 리팩토링을 쉽게 사용
+
+![alt text](image-243.png)
+
+
+##### 초기화 버튼 기능
+
+- 지역선택 초기화
+- 고속도로 기본 토글버튼
+- CCTV 목록 제거, 건수 초기화 
+- 상태바 초기화
+- 영상정지
+- 지도 초기화
 
 ### UI 변경
 
 - MahApps.Metro 또는 WPF UI
 - Light/Dark Theme
 
+#### NuGet Package 설치
+
+- 도구 > NuGet Package 관리자 > 패키지 관리자 콘솔
+
+```powershell
+PM> Install-package WPF-UI 
+```
+
+- App.xaml 태그 코드 추가
+- MainWindow.xaml 부모 클래스 변경
+- Light 테마 적용
+
+##### 변환 결과
+
+
+##### 프로그래스바
+
+- 검색 후 리스트박스 항목 다 나오기전까지 표시
+- WPF UI 적용 후 반영
+
+
+
+##### 즐겨찾기 DB 추가
+
+##### 즐겨찾기 읽어오기
 ### OpenAPI 래핑 웹서비스
