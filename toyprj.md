@@ -182,4 +182,6 @@ type `실시간`, 동영상, 정지영상 모두 같은 CCTV를 표현하는 방
 ### UI 변경
 
 - MahApps.Metro 또는 WPF UI
-- Light
+- Light/Dark Theme
+
+### OpenAPI 래핑 웹서비스
