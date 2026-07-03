@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Media;
+using Wpf.Ui;
 using Wpf.Ui.Controls;
 using WpfCctvMonitorApp.Common;
 using WpfCctvMonitorApp.Model;
@@ -11,7 +12,7 @@ using WpfCctvMonitorApp.Services;
 
 namespace WpfCctvMonitorApp {
     public partial class MainWindow : FluentWindow {
-        #region 멤버 변수
+        #region 변수영역
         // readonly - 생성자에서만 초기화 가능
         private LibVLC libVLC;
         private LibVLCSharp.Shared.MediaPlayer mediaPlayer;
@@ -19,11 +20,16 @@ namespace WpfCctvMonitorApp {
 
         // 지역을 선택한 위경도의 범위를 저장할 변수
         private GeoBound selectedGeoBound;
+
+        // WPF UI 다이얼로그 동작 서비스 인터페이스
+        private IContentDialogService contentDialogService;
+
+        private LoadingWindow? loadingWindow;
+
         #endregion
 
-#pragma warning disable CS8618 // null을 허용하지 않는 필드는 생성자를 종료할 때 null이 아닌 값을 포함해야 합니다. 'required' 한정자를 추가하거나 nullable로 선언하는 것이 좋습니다.
+        #region 기본 생성자 및 이벤트핸들러 영역
         public MainWindow()
-#pragma warning restore CS8618 // null을 허용하지 않는 필드는 생성자를 종료할 때 null이 아닌 값을 포함해야 합니다. 'required' 한정자를 추가하거나 nullable로 선언하는 것이 좋습니다.
         {
             InitializeComponent();  // 절대 손대지 말 것!
             InitLibVlc();   // VLC라이브러리 초기화
@@ -47,17 +53,28 @@ namespace WpfCctvMonitorApp {
 
             await InitWebview2Async();  // 웹뷰2 초기화
 
-            bool result = InitApiKey(); // App.config에서 API키 받아오기
+            var result = await InitApiKey(); // App.config에서 API키 받아오기
             if (!result) return;
 
+            InitAppName();
             InitStatusBar();   // xaml 화면 텍스트들 초기화
-
             initComboItems();   // 콤보박스 지역 리스트업
-        }/// <summary>
-         /// 정상적으로 실행되면 처리하는 이벤트
-         /// </summary>
-         /// <param name="sender">이벤트 발생객체</param>
-         /// <param name="e">컨트롤/객체 소유 속성들</param>
+        }
+
+        private void InitAppName()
+        {
+            // 비하인드코드로 작업하면 유지보수가 쉬움
+            // 윈도우타이틀, WPF UI TitleBar 공통작업
+            // HACK : 제목을 변경하려면 AppCommon.appName을 변경~
+            this.Title = TlbMain.Title = AppCommon.appName;
+        }
+
+
+        /// <summary>
+        /// 정상적으로 실행되면 처리하는 이벤트
+        /// </summary>
+        /// <param name="sender">이벤트 발생객체</param>
+        /// <param name="e">컨트롤/객체 소유 속성들</param>
         private void MediaPlayer_Playing(object? sender, EventArgs e)
         {
 
@@ -129,12 +146,88 @@ namespace WpfCctvMonitorApp {
 
             SetDetailInfo();
         }
-        // 종료여부 확인
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var result = System.Windows.MessageBox.Show("종료하시겠습니까?", "종료확인", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            if (result == System.Windows.MessageBoxResult.No)
+        private async void BtnSearch_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedGeoBound == null)
+            {
+                // System.Windows.MessageBox.Show("지역 선택을 먼저 하십시오", "오류");
+                await ShowMessageAsync("오류", "지역을 선택하세요");
+                return;
+            }
+            // 아니면 try ~ catch
+
+            try
+            {
+                // ProgressRing 보이기
+                // 로딩 창 열기
+                ShowLoading();
+                BtnSearch.IsEnabled = false;
+
+                // 프로세스 진행
+                AppCommon.MinX = selectedGeoBound.MinLng;
+                AppCommon.MaxX = selectedGeoBound.MaxLng;
+                AppCommon.MinY = selectedGeoBound.MinLat;
+                AppCommon.MaxY = selectedGeoBound.MaxLat;
+
+                var totalApiUrl = AppCommon.BuildCctvAiUrl();
+
+                var result = await itsCctvService.GetCctvListAsync(totalApiUrl);
+                Debug.WriteLine(result);
+                // MessageBox.Show(result.Response.DataCount.ToString());
+
+                LsbCctv.ItemsSource = result.Response.Data;
+                var roadName = AppCommon.RoadType == "ex" ? "고속도로" : "국도";
+                GrbCctv.Header = $"{roadName} CCTV 목록 (총 {result.Response.DataCount:N0}건";
+
+            }
+            catch (Exception ex)
+            {
+                // 대부분 OpenAPI 호출 이후 네트워크 문제에서 발생
+                await ShowMessageAsync("검색 오류", $"CCTV 검색 중 오류가 발생했습니다. {ex.Message}");
+                System.Windows.MessageBox.Show($"CCTV 검색 중 오류가 발생했습니다. {ex.Message}", "검색 오류",
+                                System.Windows.MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                // 로딩창 닫기
+                HideLoading();
+                BtnSearch.IsEnabled = true;
+            }
+
+        }
+
+        // 리스트박스 선택 후 이벤트
+        private async void LsbCctv_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (LsbCctv.SelectedItem is not CctvInfo selected)
+                return;
+
+            //MessageBox.Show(selected.CctvUrl);
+            PlayCctv(selected.CctvUrl);
+
+            await ShowMarkerAsync(selected);
+
+            SetDetailInfo(selected);
+            DisplayStatusBarInfo(selected);
+        }
+
+
+
+        // 종료여부 확인
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // var result = System.Windows.MessageBox.Show("종료하시겠습니까?", "종료확인", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            //if (result == System.Windows.MessageBoxResult.No)
+            //{
+            //    e.Cancel = true;
+            //    return;
+            //}
+
+            var result = await ShowConfirmAsync("종료확인", "종료하시겠습니까?");
+
+            if (!result)
             {
                 e.Cancel = true;
                 return;
@@ -148,6 +241,9 @@ namespace WpfCctvMonitorApp {
             libVLC.Dispose();
         }
 
+        #endregion
+
+        #region 커스텀 메서드 영역
 
         /// <summary>
         /// Its OpenApiService 초기화
@@ -226,14 +322,17 @@ namespace WpfCctvMonitorApp {
                 """;
         }
 
-        private static bool InitApiKey()
+        private async Task<bool> InitApiKey()
         {
             AppCommon.ItsApiKey = ConfigurationManager.AppSettings["ItsApiKey"];
 
             if (string.IsNullOrWhiteSpace(AppCommon.ItsApiKey))
             {
-                System.Windows.MessageBox.Show("ITS API Key가 설정되지 않았습니다.");
+                //System.Windows.MessageBox.Show("ITS API Key가 설정되지 않았습니다.");
+                await ShowMessageAsync("오류", "ITS API Key가 설정되지 않았습니다.");
+                return false;
             }
+            //MessageBox.Show(Common.AppCommon.ItsApiKey);
             return true;
         }
 
@@ -271,62 +370,10 @@ namespace WpfCctvMonitorApp {
                 : AppCommon.RegionBounds["전국"];
         }
 
-        private async void BtnSearch_Click(object sender, RoutedEventArgs e)
-        {
-            if (selectedGeoBound == null)
-            {
-                System.Windows.MessageBox.Show("지역 선택을 먼저 하십시오", "오류");
-                return;
-            }
-            // 아니면 try ~ catch
-
-            AppCommon.MinX = selectedGeoBound.MinLng;
-            AppCommon.MaxX = selectedGeoBound.MaxLng;
-            AppCommon.MinY = selectedGeoBound.MinLat;
-            AppCommon.MaxY = selectedGeoBound.MaxLat;
-
-
-            try
-            {
-                var totalApiUrl = AppCommon.BuildCctvAiUrl();
-
-                var result = await itsCctvService.GetCctvListAsync(totalApiUrl);
-                Debug.WriteLine(result);
-                // MessageBox.Show(result.Response.DataCount.ToString());
-
-                LsbCctv.ItemsSource = result.Response.Data;
-                var roadName = AppCommon.RoadType == "ex" ? "고속도로" : "국도";
-                GrbCctv.Header = $"{roadName} CCTV 목록 (총 {result.Response.DataCount:N0}건";
-
-            }
-            catch (Exception ex)
-            {
-                // 대부분 OpenAPI 호출 이후 네트워크 문제에서 발생
-                System.Windows.MessageBox.Show($"CCTV 검색 중 오류가 발생했습니다. {ex.Message}", "검색 오류",
-                                System.Windows.MessageBoxButton.OK, MessageBoxImage.Error);
-
-            }
-
-        }
-
-        // 리스트박스 선택 후 이벤트
-        private async void LsbCctv_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            if (LsbCctv.SelectedItem is not CctvInfo selected)
-                return;
-
-            //MessageBox.Show(selected.CctvUrl);
-            PlayCctv(selected.CctvUrl);
-
-            await ShowMarkerAsync(selected);
-
-            SetDetailInfo(selected);
-            DisplayStatusBarInfo(selected);
-        }
 
         private void DisplayStatusBarInfo(CctvInfo cctv)
         {
-            TxtCctvName.Text = $"선택 CCTV : {cctv.CctvName,80}";
+            TxtSelCctvName.Text = $"선택 CCTV : {cctv.CctvName,80}";
             TxtSelCctvUrl.Text = $"영상 URL : {AppCommon.Ellipsis(cctv.CctvUrl)}";
         }
 
@@ -334,9 +381,12 @@ namespace WpfCctvMonitorApp {
         {
             if (cctv != null)   // 실제 데이터 할당
             {
-                TxtCctvName.Text = cctv.CctvName;
-                TxtRoadName.Text = "";
-                TxtDerection.Text = "";
+                // 정규식으로 CctvName에 들어온 문자열 분해
+                var (cctvName, roadName, direction) = AppCommon.ParseName(cctv.CctvName);
+
+                TxtCctvName.Text = cctvName;
+                TxtRoadName.Text = roadName;
+                TxtDerection.Text = direction;
                 TxtCoordY.Text = cctv.CoordY;
                 TxtCoordX.Text = cctv.CoordX;
                 TxtCctvFormat.Text = cctv.CctvFormat;
@@ -364,7 +414,7 @@ namespace WpfCctvMonitorApp {
 
         // 스트리밍 재생 메서드
 
-        private void PlayCctv(string url)
+        private async Task PlayCctv(string url)
         {
             if (string.IsNullOrEmpty(url))
                 return;
@@ -380,10 +430,68 @@ namespace WpfCctvMonitorApp {
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                await ShowMessageAsync("오류", $"스트리밍 재생 오류 발생 : {ex.Message}");
+                //System.Windows.MessageBox.Show(ex.Message);
             }
 
         }
+
+        // 단순 MessageBox.Show 대신 사용할 기능
+
+        private async Task ShowMessageAsync(string title, string message)
+        {
+
+            var uiMessagebox = new Wpf.Ui.Controls.MessageBox()
+            {
+                Title = title,
+                Content = message
+            };
+
+            _ = await uiMessagebox.ShowDialogAsync();
+        }
+
+        // 예/아니오 선택 MesageBox.Show 대신 사용할 메서드
+        private async Task<bool> ShowConfirmAsync(string title, string message)
+        {
+            var uiMessagebox = new Wpf.Ui.Controls.MessageBox()
+            {
+                Title = title,
+                Content = message,
+
+                PrimaryButtonText = "예",
+                SecondaryButtonText = "아니오",
+                IsCloseButtonEnabled = false
+            };
+
+            var result = await uiMessagebox.ShowDialogAsync();
+
+            return result == Wpf.Ui.Controls.MessageBoxResult.Primary;
+        }
+
+        // 로딩창 열기
+        private void ShowLoading()
+        {
+            if (loadingWindow != null) return;
+
+            loadingWindow = new LoadingWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            loadingWindow.Show();
+        }
+
+        // 로딩창 닫기
+        private void HideLoading()
+        {
+            if (loadingWindow == null) return;
+
+            loadingWindow.Close();
+            loadingWindow = null;
+        }
+
+        #endregion
 
     }
 }

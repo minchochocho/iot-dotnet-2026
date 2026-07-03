@@ -285,11 +285,16 @@ PM> Install-package WPF-UI
 
 ##### 추가 수정
 
-- 제목표시줄 추가 - WPF UI 특성
-- CCTV 정보 글자 잘라서 표기
-- 리스트박스 목록 텍스트 정리, 
-- 종료 버튼 표시
-- 메시지박스 변경
+- [x] 제목표시줄 추가 - WPF UI 특성
+- [x] 메시지박스 변경
+    ![alt text](image-244.png)
+    ![alt text](image-245.png)
+
+- [x] CCTV 정보 글자 잘라서 표기
+    ![alt text](image-246.png)
+
+- [ ] 리스트박스 목록 텍스트 정리, 
+- [ ] 종료 버튼 표시
 
 
 ##### 프로그래스바

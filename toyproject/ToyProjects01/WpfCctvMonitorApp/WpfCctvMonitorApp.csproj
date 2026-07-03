@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="cctv-camera.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="cctv-camera.ico" />
     <Content Include="Map\map.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -22,6 +26,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
     <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="cctv-camera.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

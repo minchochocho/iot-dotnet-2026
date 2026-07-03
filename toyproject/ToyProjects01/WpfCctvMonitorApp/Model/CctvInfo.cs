@@ -1,7 +1,7 @@
 ﻿namespace WpfCctvMonitorApp.Model {
     public class CctvInfo {
-        public string CoordType { get; set; }
-        public int DataCount { get; set; }
+        //public string CoordType { get; set; }
+        //public int DataCount { get; set; }
         public string RoadsectionId { get; set; }
         public string FileCreateTime { get; set; }
         public string CctvType { get; set; }
