@@ -4,7 +4,8 @@ namespace WpfCctvMonitorApp.Common {
     internal class AppCommon {
         public const string appName = "국가교통정보센터 CCTV 정보 앱";
         // TODO : 구버전 서비스URL. 변경필요
-        public const string baseUrl = "https://openapi.its.go.kr:9443/cctvInfo";
+        //public const string baseUrl = "https://openapi.its.go.kr:9443/cctvInfo";
+        public const string baseUrl = "http://localhost:5100/api/itscctv";
 
 
         // 승인받은 API키 입력. user-secrets, sets 외부공개 안하거나, App.config 환경변수로 분리 저장
@@ -17,25 +18,25 @@ namespace WpfCctvMonitorApp.Common {
 
         // 대한민국 지도 영역
         // 위도 y
-        public static double MinY { get; set; } = 33.100000;
-        public static double MaxY { get; set; } = 39.000000;
-        // 경도 x
-        public static double MinX { get; set; } = 126.000000;
-        public static double MaxX { get; set; } = 129.660000;
+        //public static double MinY { get; set; } = 33.100000;
+        //public static double MaxY { get; set; } = 39.000000;
+        //// 경도 x
+        //public static double MinX { get; set; } = 126.000000;
+        //public static double MaxX { get; set; } = 129.660000;
 
         // TODO
-        public static string BuildCctvAiUrl()
-        {
-            return $"{baseUrl}" +
-                   $"?apiKey={ItsApiKey}" +
-                   $"&type={RoadType}" +
-                   $"&cctvType={CctyType}" +
-                   $"&minX={MinX}" +
-                   $"&maxX={MaxX}" +
-                   $"&minY={MinY}" +
-                   $"&maxY={MaxY}" +
-                   $"&getType={GetType}";
-        }
+        //public static string BuildCctvAiUrl()
+        //{
+        //    return $"{baseUrl}" +
+        //           $"?apiKey={ItsApiKey}" +
+        //           $"&type={RoadType}" +
+        //           $"&cctvType={CctyType}" +
+        //           $"&minX={MinX}" +
+        //           $"&maxX={MaxX}" +
+        //           $"&minY={MinY}" +
+        //           $"&maxY={MaxY}" +
+        //           $"&getType={GetType}";
+        //}
 
         public static readonly string[] Regions =
         {

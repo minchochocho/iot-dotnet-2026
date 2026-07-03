@@ -285,16 +285,11 @@ PM> Install-package WPF-UI
 
 ##### 추가 수정
 
-- [x] 제목표시줄 추가 - WPF UI 특성
-- [x] 메시지박스 변경
-    ![alt text](image-244.png)
-    ![alt text](image-245.png)
-
-- [x] CCTV 정보 글자 잘라서 표기
-    ![alt text](image-246.png)
-
-- [ ] 리스트박스 목록 텍스트 정리, 
-- [ ] 종료 버튼 표시
+- 제목표시줄 추가 - WPF UI 특성
+- CCTV 정보 글자 잘라서 표기
+- 리스트박스 목록 텍스트 정리, 
+- 종료 버튼 표시
+- 메시지박스 변경
 
 
 ##### 프로그래스바
@@ -302,9 +297,66 @@ PM> Install-package WPF-UI
 - 검색 후 리스트박스 항목 다 나오기전까지 표시
 - WPF UI 적용 후 반영
 
-
+##### UI 적용화면
 
 ##### 즐겨찾기 DB 추가
 
 ##### 즐겨찾기 읽어오기
+
 ### OpenAPI 래핑 웹서비스
+
+#### 브릿지 웹서비스 구현
+
+##### ASP.NET Core API 프로젝트
+
+##### WPF 앱 필요 클래스 가져오기
+
+- 네임스페이스 현재이름으로 변경
+    - AppCommon.cs 불필요한 속성 제거
+    - CctvInfo.cs
+    - CctvResponse.cs
+    - ItsCctvService.cs 수정
+
+##### Program.cs에 서비스 등록
+
+- ItsCctvService 등록
+
+
+##### appsettings.json
+- Its 서비스키 추가
+
+##### ApiController 추가
+
+- ItsCctvController.cs 클래스 생성
+
+##### 실행결과
+
+![alt text](image-247.png)
+
+- WPF에서 결과 json 구조 변경
+
+#### 이전 WPF 연계 작업
+
+##### API 웹서비스에 있는 CctvResultDto 가져오기
+
+- WPF로 복사
+- 오류나는 부분들 전체 수정
+
+#### 전체 다이어그램
+
+![alt text](image-248.png)
+
+#### 사용기술
+
+|구분|기술|
+|---|---|
+| 윈앱 UI | WPF(.NET 10) UI Framework|
+|통신|HTTP(HTTPS 확장 가능)|
+|데이터형식|JSON, 직렬화, 역직렬화|
+|브릿지서버 | ASP.NET Core Web API|
+|웹서버| Kestrel(크로스플랫폼 웹서버)|
+|설정관리| appsettings.json, App.config(XML)|
+|서비스호출 | HttpClient |
+|외부API | ITS 국가교통정보센터 OpenAPI |
+|API방식 | REST API|
+|웹아키텍처 | Model-service-Controller Layer|

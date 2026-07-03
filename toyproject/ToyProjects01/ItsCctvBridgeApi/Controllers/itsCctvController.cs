@@ -13,13 +13,14 @@ namespace ItsCctvBridgeApi.Controllers {
         {
             this.service = service;
         }
-
         [HttpGet]
         public async Task<IActionResult> SearchCctv(CctvRequest request)
         {
-            var result = await service.GetCctvListAsync("testURL");
+            //var result = await service.GetCctvListAsync("testURL");
+            var result = await service.GetCctvSearchAsync(request);
 
             return Ok(result);
         }
+
     }
 }

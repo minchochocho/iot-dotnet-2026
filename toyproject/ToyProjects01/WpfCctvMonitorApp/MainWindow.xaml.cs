@@ -1,5 +1,4 @@
 ﻿using LibVLCSharp.Shared;
-using System.Configuration;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Windows;
@@ -53,8 +52,8 @@ namespace WpfCctvMonitorApp {
 
             await InitWebview2Async();  // 웹뷰2 초기화
 
-            var result = await InitApiKey(); // App.config에서 API키 받아오기
-            if (!result) return;
+            // var result = await InitApiKey(); // App.config에서 API키 받아오기
+            // if (!result) return;
 
             InitAppName();
             InitStatusBar();   // xaml 화면 텍스트들 초기화
@@ -165,20 +164,34 @@ namespace WpfCctvMonitorApp {
                 BtnSearch.IsEnabled = false;
 
                 // 프로세스 진행
-                AppCommon.MinX = selectedGeoBound.MinLng;
-                AppCommon.MaxX = selectedGeoBound.MaxLng;
-                AppCommon.MinY = selectedGeoBound.MinLat;
-                AppCommon.MaxY = selectedGeoBound.MaxLat;
+                //AppCommon.MinX = selectedGeoBound.MinLng;
+                //AppCommon.MaxX = selectedGeoBound.MaxLng;
+                //AppCommon.MinY = selectedGeoBound.MinLat;
+                //AppCommon.MaxY = selectedGeoBound.MaxLat;
 
-                var totalApiUrl = AppCommon.BuildCctvAiUrl();
+                //var totalApiUrl = AppCommon.BuildCctvAiUrl();
 
-                var result = await itsCctvService.GetCctvListAsync(totalApiUrl);
+                //var result = await itsCctvService.GetCctvListAsync(totalApiUrl);
+
+                var request = new CctvRequest
+                {
+                    CctvType = 1,
+                    GetRetType = "json",
+                    RoadType = AppCommon.RoadType,
+                    MinX = selectedGeoBound.MinLng,
+                    MaxX = selectedGeoBound.MaxLng,
+                    MinY = selectedGeoBound.MinLat,
+                    MaxY = selectedGeoBound.MaxLat
+                };
+
+                var result = await itsCctvService.GetBridgeApiAsync(request);
+
                 Debug.WriteLine(result);
                 // MessageBox.Show(result.Response.DataCount.ToString());
 
-                LsbCctv.ItemsSource = result.Response.Data;
+                LsbCctv.ItemsSource = result;
                 var roadName = AppCommon.RoadType == "ex" ? "고속도로" : "국도";
-                GrbCctv.Header = $"{roadName} CCTV 목록 (총 {result.Response.DataCount:N0}건";
+                GrbCctv.Header = $"{roadName} CCTV 목록 (총 {result.Count:N0}건";
 
             }
             catch (Exception ex)
@@ -200,7 +213,7 @@ namespace WpfCctvMonitorApp {
         // 리스트박스 선택 후 이벤트
         private async void LsbCctv_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (LsbCctv.SelectedItem is not CctvInfo selected)
+            if (LsbCctv.SelectedItem is not CctvResultDto selected)
                 return;
 
             //MessageBox.Show(selected.CctvUrl);
@@ -322,19 +335,19 @@ namespace WpfCctvMonitorApp {
                 """;
         }
 
-        private async Task<bool> InitApiKey()
-        {
-            AppCommon.ItsApiKey = ConfigurationManager.AppSettings["ItsApiKey"];
+        //private async Task<bool> InitApiKey()
+        //{
+        //    AppCommon.ItsApiKey = ConfigurationManager.AppSettings["ItsApiKey"];
 
-            if (string.IsNullOrWhiteSpace(AppCommon.ItsApiKey))
-            {
-                //System.Windows.MessageBox.Show("ITS API Key가 설정되지 않았습니다.");
-                await ShowMessageAsync("오류", "ITS API Key가 설정되지 않았습니다.");
-                return false;
-            }
-            //MessageBox.Show(Common.AppCommon.ItsApiKey);
-            return true;
-        }
+        //    if (string.IsNullOrWhiteSpace(AppCommon.ItsApiKey))
+        //    {
+        //        //System.Windows.MessageBox.Show("ITS API Key가 설정되지 않았습니다.");
+        //        await ShowMessageAsync("오류", "ITS API Key가 설정되지 않았습니다.");
+        //        return false;
+        //    }
+        //    //MessageBox.Show(Common.AppCommon.ItsApiKey);
+        //    return true;
+        //}
 
         private void InitStatusBar()
         {
@@ -371,13 +384,13 @@ namespace WpfCctvMonitorApp {
         }
 
 
-        private void DisplayStatusBarInfo(CctvInfo cctv)
+        private void DisplayStatusBarInfo(CctvResultDto cctv)
         {
             TxtSelCctvName.Text = $"선택 CCTV : {cctv.CctvName,80}";
             TxtSelCctvUrl.Text = $"영상 URL : {AppCommon.Ellipsis(cctv.CctvUrl)}";
         }
 
-        private void SetDetailInfo(CctvInfo? cctv = null)
+        private void SetDetailInfo(CctvResultDto? cctv = null)
         {
             if (cctv != null)   // 실제 데이터 할당
             {
@@ -387,22 +400,22 @@ namespace WpfCctvMonitorApp {
                 TxtCctvName.Text = cctvName;
                 TxtRoadName.Text = roadName;
                 TxtDerection.Text = direction;
-                TxtCoordY.Text = cctv.CoordY;
-                TxtCoordX.Text = cctv.CoordX;
+                TxtCoordY.Text = cctv.CoordY.ToString();
+                TxtCoordX.Text = cctv.CoordX.ToString();
                 TxtCctvFormat.Text = cctv.CctvFormat;
             }
             else    // 초기화
             {
-                TxtCctvName.Text = string.Empty;
+                TxtCctvName.Text = "";
                 TxtRoadName.Text = "";
                 TxtDerection.Text = "";
-                TxtCoordY.Text = string.Empty;
-                TxtCoordX.Text = string.Empty;
-                TxtCctvFormat.Text = string.Empty;
+                TxtCoordY.Text = "";
+                TxtCoordX.Text = "";
+                TxtCctvFormat.Text = "";
             }
         }
 
-        private async Task ShowMarkerAsync(CctvInfo cctv)
+        private async Task ShowMarkerAsync(CctvResultDto cctv)
         {
             double lat = Convert.ToDouble(cctv.CoordY);
             double lng = Convert.ToDouble(cctv.CoordX);

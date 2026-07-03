@@ -13,7 +13,7 @@ namespace WpfCctvMonitorApp.Model {
         public int CoordType { get; set; } = 0;
 
         [JsonProperty("data")]
-        public List<CctvInfo> Data { get; set; } = new();
+        public List<CctvResultDto> Data { get; set; } = new();
 
         [JsonProperty("datacount")]
         public int DataCount { get; set; } = 0;
