@@ -1,0 +1,55 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MahApps.Metro.Controls.Dialogs;
+using System.Windows;
+using System.Windows.Controls;
+using WpfMvvm02.Views;
+
+namespace WpfMvvm02.ViewModels {
+    public partial class MainViewModel : ObservableObject {
+        [ObservableProperty]
+        private string title = string.Empty;
+
+        // 메인화면 영역
+        [ObservableProperty]
+        private UserControl currentView;
+
+        private readonly IDialogCoordinator _coordinator;
+
+        public MainViewModel() {
+            title = "BookRentalShop v1.0";
+        }
+
+        public MainViewModel(IDialogCoordinator coordinator) {
+            title = "BookRemtalShop v1.1";
+            this._coordinator = coordinator;    // App.zaml.cs에서 생성하면서 넘어온 파라미터를 초기화
+        }
+
+
+        #region `Command(명령) 처리 메서드`
+
+        // public이어야 명령을 view에서 사용가능
+        [RelayCommand]
+        public async Task AppExit() {
+            //MessageBox.Show("프로그램을 종료합니다.");
+
+            var result = await _coordinator.ShowMessageAsync(this, "종료확인", "종료하시겠습니까?", MessageDialogStyle.AffirmativeAndNegative);
+
+            if (result == MessageDialogResult.Affirmative) {
+                Application.Current.Shutdown();
+
+            } else return;
+
+        }
+
+        [RelayCommand]
+        public void ShowDivision() {
+            var view = new DivisionView();
+            view.DataContext = new DivisionViewModel(DialogCoordinator.Instance);
+
+            currentView = view;
+        }
+
+        #endregion
+    }
+}
