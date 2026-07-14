@@ -14,7 +14,7 @@ namespace WpfMvvm02.Views {
     /// <summary>
     /// DivisionView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class DivisionView : Window {
+    public partial class DivisionView : UserControl {
         public DivisionView() {
             InitializeComponent();
         }

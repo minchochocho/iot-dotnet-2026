@@ -20,4 +20,10 @@
     <PackageReference Include="MySqlConnector" Version="2.6.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Views\BookView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

@@ -208,11 +208,36 @@ private Person? selectedPerson;
 
 #### MVVM 패턴에서 다이얼로그 처리
 
-- MVVM 패턴에서 MahApps.Metro의
+- MVVM 패턴에서 MahApps.Metro의,
     - this.ShowMessageAsync() 메서드 사용 불가
 - MVVM 패턴에 맞춰서 설정
 
-- Main
+- App.xaml.cs에서 MainViewModel 객체 생성시 파라미터 추가
+
+```cs
+view.DataContext = new MainViewModel(DialogCoordinator.Instance);
+```
+
+- MainViewModel에 IDialogCoordinator 인터페이스 할당받는 생성자 추가
+
+```cs
+private readonly IDialogCoordinator _coordinator;
+
+public MainViewModel(IDialogCoordinator coordinator) {
+    title = "BookRentalShop v1.1";
+    this._coordinator = coordinator; // App.xaml.cs에서 생성하면서 넘어온 파라미터를 초기화
+}
+
+// 메서드 내 사용법
+[RelayCommand]
+public async Task AppExit() {
+    //MessageBox.Show("프로그램을 종료합니다.");
+
+    await this._coordinator.ShowMessageAsync(this, "종료확인", "종료하시겠습니까?");
+}
+```
+
+- MainView.xaml mah:MetroWindow 태그에 다이얼로그 속성 추가
 
 ```xml
 <mah:MetroWindow x:Class="WpfMvvm02.Views.MainView"
@@ -220,3 +245,50 @@ private Person? selectedPerson;
         Title="{Binding Title}" Height="550" Width="1000"
         mah:DialogParticipation.Register="{Binding}">
 ```
+
+- 실행결과
+
+![alt text](image-257.png)
+
+#### 메인영역 화면 전환
+
+- page로 화면전환은 Frame 컨트롤 사용
+    - 네비게이션(웹브라우저)이라 뒤로가기 앞으로가기 등의 버튼이 있슴
+- UserControl로 화면전환은 ContentControl 컨트롤 사용
+
+- MainView 화면
+
+```xml
+<!-- 메인 영역(장르관리, 도서관리, 회원관리, 대여관리) -->
+<ContentControl Grid.Row="1" Content="{Binding CurrentView}"></ContentControl>
+```
+
+- MainViewModel 클래스
+
+```cs
+        [ObservableProperty]
+        private UserControl currentView;
+        // public CurrentView 자동생성
+```
+
+- MainView 메뉴 명령추가
+
+```xml
+<MenuItem Header="책장르" Command="{Binding ShowDivisionCommand}">
+```
+
+- MainViewModel.ShowDivision() 메서드
+
+```cs
+public void ShowDivision() {
+    //MessageBox.Show("TEST");
+    var view = new DivisionView();
+    view.DataContext = new DivisionViewModel(DialogCoordinator.Instance);
+
+    CurrentView = view;
+}
+```
+
+- 실행화면
+
+![alt text](image-258.png)

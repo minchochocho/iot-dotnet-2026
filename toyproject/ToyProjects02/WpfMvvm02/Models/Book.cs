@@ -24,7 +24,7 @@ namespace WpfMvvm02.Models {
         private string isbn = string.Empty;
 
         [ObservableProperty]
-        private int price;
+        private Decimal price;
 
     }
 }
