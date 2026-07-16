@@ -10,13 +10,16 @@
 
 - [MVVM 패턴 학습 + 앱개발](./TOYPROJECT2.md)
 
+
 ### 깃허브 대문 작성
 
-- GitHub 대문 Readme.md
+- [GitHub 대문 Readme](./TOYPROJECT3.md)
 
-### Unity ProductApp 기능 개선
 
-- 각 상품 클릭시 3D 박스와 연계
+### AI 비전 검사 시스템
+
+- [Python AI + WebAPI + MQTT 연계](./TOYPROJECT4.md)
+
 
 ### IoT 스마트홈 통합 플랫폼
 
@@ -26,10 +29,53 @@
 
 - 컨베이어벨트 조별 + MQTT + Unity 연계
 
-### AI 비전 검사 시스템
+### Unity ProductApp 기능 개선
 
-- Python AI + WebAPI + MQTT 연계
+- 각 상품 클릭시 3D 박스와 연계
+- 로봇팔 오브젝트 연계
 
 ### 실시간 채팅 시스템 + 챗봇 기능
 
 - Python AI + SignalR API
+
+### 취업처 설명
+
+- 사람인, 잡코리아 확인
+    - 분야 입력(임베디드)
+    - 신입 선택, 학력 미선택
+
+### 네트워크 연결 설정
+
+- 여러사람이 같이 한 PC(서버) 공유할 수 있도록 공유기/라우터 설정
+
+- 사용중인 공유기 정보 확인
+
+![alt text](image-267.png)
+
+![alt text](image-268.png)
+
+
+- 현재 포트포워딩 상태
+
+- MQTT 포트포워드 설정 지정
+
+![alt text](image-269.png)
+
+
+- 이후 설정 저장
+
+![alt text](image-270.png)
+
+- 윈도우 방화벽 포트 연결 허용 설정
+
+![alt text](image-271.png)
+
+- 외부 아이피로 접속 확인
+
+![alt text](image-272.png)
+
+#### MQTT 브로커 접속
+
+![alt text](image-273.png)
+
+- MQTT Explorer에서 Publish 확인

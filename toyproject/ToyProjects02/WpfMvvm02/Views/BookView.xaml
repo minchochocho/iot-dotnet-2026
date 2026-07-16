@@ -62,10 +62,11 @@
                 
                 <ComboBox Grid.Row="1" Margin="3"
                           mah:TextBoxHelper.Watermark="장르명" 
-                          SelectedValuePath="Key"
+                          	
+                          SelectedValuePath="DivCode"
                           DisplayMemberPath="DivName"
-                          ItemsSource="{Binding SelectedBook.DivCode,
-                                                Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                          ItemsSource="{Binding Divisions}"
+                          SelectedValue="{Binding SelectedBook.DivCode}"/>
 
                 <TextBox  Grid.Row="2"  Margin="3"
                           mah:TextBoxHelper.AutoWatermark="True"
@@ -111,7 +112,7 @@
                     
                     <Button Content="저장" Margin="0,0,5,0"
                             Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}"
-                    Command="{Binding SaveCommand}"/>
+                    Command="{Binding SaveasyncCommand}"/>
                     
                     <Button Content="삭제" Margin="0,0,5,0"
                             Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}"

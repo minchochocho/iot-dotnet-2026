@@ -18,11 +18,11 @@
     - MVC 패턴과의 차이점 - Controller 대신인 ViewModel이 아니라 `View`가 대문
     - View에서 동작의 처리를 시작, **이벤트 핸들러가 모두 사라짐**
     - View에 해당하는 xaml.cs 파일에는 아무런 로직이 안들어감(디자이너가 로직을 생각하지 말것)
-    - 버튼, 키보드 이벤트가 모두 ViewModel로 넘어감 -> Command
+    - 버튼, 키보드 이벤트가 모두 ViewModel로 넘어감 -> `Command`
     - 단점
         - 디버깅이 어려움(몇몇 상태는 디버깅이 안됨)
 
-![alt text](image-249.png)
+![alt text](image-264.png)
 
 - MVVM 라이브러리 - 손쉽게 MVVM 구현을 도와주는 역할
     - `CommunityToolkit.Mvvm` - MS개발. 가장 일반적. 난이도 하
@@ -119,6 +119,7 @@ private void ChangeMessage()
 #### View에 버튼 추가
 
 - ViewModel의 RelayCommand 메서드명 + Command 입력 필수
+- 비동기 명령 메서드는 Async 생략 가능
 
 ```xml
 <Button Content="변경" Command="{Binding ChangeMessageCommand}>
@@ -144,7 +145,7 @@ private void ChangeMessage()
 
 #### ListView 데이터 바인딩
 
-- ViewModel에 ObservableCollection 사용
+- ViewModel에 `ObservableCollection` 사용
 
 ```cs
 public ObservableCollection<Person> People { get; } =
@@ -197,7 +198,7 @@ private Person? selectedPerson;
 
 #### 패턴 폴더 생성
 
-- Models, Views, ViewModels
+- `Models`, `Views`, `ViewModels`
 
 
 ### C# 줄바꿈 설정
@@ -292,3 +293,78 @@ public void ShowDivision() {
 - 실행화면
 
 ![alt text](image-258.png)
+
+#### 화면 복제
+- View xaml 파일 복사, 이름변경/클래스명 변경
+- ViewModel 클래스 복사, 이름변경/ 클래스명 변경
+- MainView에서 메뉴 명령 추가
+- MainViewModel에서 명령에 바인딩되는 메서드 추가
+
+
+#### 데이터 수정 후 변경표시 안되는 오류
+
+![alt text](image-259.png)
+
+- 콤보박스 데이터가 바인딩된 컨트롤 데이터 선택 시 바인딩 모드 문제 발생
+- 콤보박스 SelectedValue 기본 바인딩모드 TwoWay
+
+```xml
+<ComboBox 
+    Grid.Row="1" Margin="3" 
+    mah:TextBoxHelper.Watermark="장르명"
+    ItemsSource="{Binding Divisions}"
+    SelectedValuePath="DivCode"
+    DisplayMemberPath="DivName"
+    SelectedValue="{Binding SelectedBook.DivCode, 
+                            UpdateSourceTrigger=PropertyChanged}"/>
+```
+
+- UpdateSourceTrigger=PropertyChanged 옵션. 없애도 됨
+- 텍스트박스 Text 기본 바인딩모드 Twoway, 직접반영
+
+- ViewModel에서 ObservableCollection<> 객체 생성, DB 데이터 로드전에 초기화 로직을 잘못작성해서 생긴 문제
+
+#### Insert, Delete 기능 추가
+
+- DB 데이터 저장 - BookIdx가 0이면 INSERT
+- 초기화 기능 - SelectedBook 초기화
+- 입력검증 - 쓰레기 데이터 저장 방지
+
+![alt text](image-260.png)
+
+- 삭제 기능
+
+```cs
+new MetroDialogSettings {
+    AffirmativeButtonText = "삭제",  // OK 대신
+    NegativeButtonText = "취소"  // Cancel 대신
+});
+```
+
+![alt text](image-261.png)
+
+- 삭제버튼 활성화 토글 - 삭제확인 메시지창보다 버튼 자체 비활성화
+- MVVM 기능 CanCommand 
+
+```cs
+[ObservableProperty]
+[NotifyCanExecuteChangedFor(nameof(DeleteCommand))]  // 변경알림
+private Book selectedBook;
+
+[RelayCommand(CanExecute = nameof(CanDelete))]
+public async Task DeleteAsync() {
+    // ...
+
+public bool CanDelete() {
+    return SelectedBook is { BookIdx: > 0 };
+}
+```
+
+![alt text](image-262.png)
+
+#### 예외처리
+
+- [x] 저장버튼만 누르면 프로그램 종료
+- [x] 입력검증 시 컨트롤마다 메시지창이 뜨는 비효율성
+
+![alt text](image-263.png)
