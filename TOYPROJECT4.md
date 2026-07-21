@@ -89,15 +89,133 @@ if __name__ == '__main__':
 
 #### Pydantic 모델 사용
 
-#### Put 메서드 처리 API
+- POST 요청으로 JSON을 데이터를 받을때 사용하는 모델 패키지. C# Newtonsoft.Json과 동일한 역할 : [소스](./toyproject/ToyProjects04/pythonAi/main04.py)
+
+![alt text](image-278.png)
+
+- 데이터 입력시 Validation 체크 
+
+```json
+{
+  "id": 4,
+  "name": "Test",
+  "price": 1000
+}
+```
+
+![alt text](image-279.png)
+
+- products 배열(리스트)에 제품 등록
+
+![alt text](image-280.png)
+
+![alt text](image-281.png)
+
+#### Put/Delete 메서드 처리 API
+
+- 나중에...
 
 ### Python AI 물체인식
 
-- OvenCV + PyTorch + YOLO
+- OpenCV + PyTorch + YOLO
 
-### WebAPI
+```powershell
+(venv) PS > pip install opencv-python
+(venv) PS > nvidia-smi
+----------------------------------------+
+...              CUDA Version: 13.1     |
+-----------------+----------------------+
 
-### 연동
+(venv) PS > pip install torch torchvision --index-url https://download.pytorch.org/whl/cu130
+(venv) PS > pip install ultralytics
+(venv) PS > pip install python-multipart
+```
+
+#### 기본 API 서비스 
+
+- 비전용 FastAPI 서비스 - [소스](./toyproject/ToyProjects04/pythonAi/main05.py)
+
+#### 기본 이미지 출력
+
+```python
+@app.get('/')
+async def root():
+    image = Image.open('./test01.png')  # PILLOW 패키지로 이미지오픈 메모리업로드
+
+    return FileResponse('./test01.png', media_type='image/png')
+```
+
+![alt text](image-282.png)
+
+#### Pillow 오픈 뒤 전송
+
+```python
+@app.get('/')
+async def root():
+    image = Image.open('./test01.png')  # PILLOW 패키지로 이미지오픈 메모리 업
+
+    buffer = BytesIO()
+    image.save(buffer, format='PNG')
+    buffer.seek(0)
+
+    return StreamingResponse(buffer, media_type='image/png')
+```
+
+#### YOLO 물체인식
+
+- detectObjects() : [소스](./toyproject/ToyProjects04/pythonAi/main05.py)
+
+![alt text](image-283.png)
+
+- 신뢰도 표시
+
+![alt text](image-287.png)
+
+#### 결과이미지 타서버 요청및 인식결과 응답
+
+- Post 함수 : [소스](./toyproject/ToyProjects04/pythonAi/main05.py)
+- 타 서버에서 이미지 객체 인식을 요청해서, 인식된 결과를 돌려주는 작업
+
+![alt text](image-285.png)
+
+![alt text](image-286.png)
+
+### ASP.NET Core WebSite
+
+- 백엔드 RestAPI형태 + 프론트엔드 일반 HTML 
+    - 프론트엔드 React, WPF 등 확장 가능
+
+- ASP.NET Core웹앱(MVC) 프로젝트 생성
+    - Model, Views 폴더 삭제
+    - wwwroot 아래 폴더 모두 삭제
+    
+- Program.cs 수정
+
+- NetServiceController.cs 추가 - [소스](./toyproject/ToyProjects04/BackendCs/ResponseAiServer/Controllers/NetServiceController.cs)
+
+- index.html 작성 - [소스](./toyproject/ToyProjects04/BackendCs/ResponseAiServer/wwwroot/index.html)
+
+- 실행 결과
+
+![alt text](image-288.png)
+
+
+### 동영상, 웹캠 실시간 객체인식
+
+- MQTT(WebSocket) 사용해서 동영상 전달
+
+```powershell
+(venv) PS > pip install paho-mqtt
+```
+
+- 웹서비스 불필요
+
+- 동영상 물체인식 - [소스](./toyproject/ToyProjects04/pythonAi/main06.py)
+
+![alt text](image-289.png)
+
+- MQTT 전송
+
+- ASP.NET 웹페이지 객체인식결과 스트리밍
 
 ### 비전검사
-
