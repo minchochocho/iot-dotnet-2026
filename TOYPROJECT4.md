@@ -214,8 +214,96 @@ async def root():
 
 ![alt text](image-289.png)
 
-- MQTT 전송
+#### MQTT 전송
+
+- MQTT 브로커 설정 수정 - WebSocket 사용을 위한 설정 추가
+- 윈도우 서비스(services.msc)에서 mosquitto brocker실행 중지
+- mosquitto.conf 파일 수정
+
+```conf
+# 기본 MQTT 설정 - 그대로 사용
+listener 1883
+protocol mqtt
+
+# WebSocket 설정 - 스트리밍용 추기
+listener 9001
+protocol websocket
+```
+
+|포트|프로토콜|주사용처|
+|--|--|--|
+|1883|MQTT|Pythonm ESP32, RasberryPi 등|
+|9001|WebSocket|Javascript, Unity WebGL, Streaming|
+
+![alt text](image-291.png)
+
+- 데이터 전달확인
+
+![alt text](image-290.png)
 
 - ASP.NET 웹페이지 객체인식결과 스트리밍
 
-### 비전검사
+동영상 업로드
+
+- 클래스별로 색상다르게 표시
+
+```python
+### 색상설정 함수
+def getColors(num_colors):
+    np.random.seed(42)
+    colors = [tuple(np.random.randint(0,255,3).tolist()) for _ in range(num_colors)]
+
+    return colors
+
+# 색상표
+class_names = model.names   # YOLOv8m 대략 80개
+num_classes = len(class_names)
+colors = getColors(num_classes)
+
+# 클래스별로 색상 변경
+cv2.rectangle(image, (x1,y1), (x2,y2), colors[int(class_id)], thickness=2)
+cv2.putText(image, f'{label} {conf:.2f}', (x1+7, y2-7), 
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[int(class_id)], 2)
+```
+
+- 실시간 물체인식
+
+![alt text](image-292.png)
+
+### 비전 검사 토이프로젝트
+
+- 현재까지
+    - 웹 이미지 객체 탐지
+    - 웹캠/동영상 객체 탐지
+    - 사람 모자이크 처리
+
+- 난이도 하
+    - 탐지된 객체수 집계
+    - 진행방향별 차량 통과수 집계
+    - 반려동물 감지 시스템
+
+- 난이도 중
+    - 사람 출입 카운터
+    - 진행방향별 차량 통행량 분석
+    - 주차장 차량관리
+    - 침입 감지 시스템
+    - 장기 체류자 감지
+    - 쓰러짐 감지
+
+- 난이도 상
+    - 안전모 착용 감지
+    - 운전중 졸음 감지
+    - 불량품 검출
+    - 제품 수량 검사, 포장 누락 검사
+    - 공정 위치 이탈 감지
+    - `화재/연기 감지`
+    - 위험구역 접근 감지
+    - 공장 라인 생산량 집계
+    - AI 스마트 경광등, 도어, 쓰레기통, 농장 동물 감지
+    
+### 화재/연기 감지 알람시스템
+
+- Python에서 진행한 화재/연기 감지 소스 활용
+- firedetect-11s.pt 사전학습 모델 활용
+
+

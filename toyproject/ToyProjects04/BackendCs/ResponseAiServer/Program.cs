@@ -23,10 +23,13 @@ namespace ResponseAiServer {
 
             app.UseCors();
 
-            app.UseDefaultFiles();   // index.html 자동 실행
-            app.UseStaticFiles();    // html/css/js 제공
-
-            app.MapStaticAssets();
+            // "/" 접속 시 streaming.html을 기본 페이지로 사용 (주소 변경 없이)
+            var options = new DefaultFilesOptions();
+            options.DefaultFileNames.Clear();
+            options.DefaultFileNames.Add("streaming.html");
+            app.UseDefaultFiles(options);
+            
+            app.UseStaticFiles();
 
             app.MapControllers();
 

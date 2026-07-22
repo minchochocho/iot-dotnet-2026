@@ -44,22 +44,25 @@ api = cv2.CAP_DSHOW #window DirectX Show
 
 # VideoCapture 시작 - 0:웹캠 또는 동영상 경로
 # 일반 동영상은 DirectShow가 불가, 웹캠만 가능
-cap = cv2.VideoCapture('./traffic_test2.mp4')
+cap = cv2.VideoCapture('./traffic_test.mp4')
 # cap = cv2.VideoCapture(0,api)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, w) # 웹캡 width 640으로 고정
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h) # 웹캠 height를 360으로 고정
 
 while cap.isOpened():
     ret, frame = cap.read()
-    frame = cv2.resize(frame, (w,h))    # 동영상의 크기 조절
+    # frame = cv2.resize(frame, (w,h))    # 동영상의 크기 조절
 
-    if not ret:break    # 동영상이 열리지 않으면 종료
+    # if not ret:break    # 동영상이 열리지 않으면 종료
+    if not ret: # 무한반복
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        continue
 
     resultImg = detectObjects(frame)
 
     cv2.imshow('Result',frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'): break
+    if cv2.waitKey(3) & 0xFF == ord('q'): break
 
 # 리소스 해제
 cap.release()
