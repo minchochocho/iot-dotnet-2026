@@ -307,3 +307,17 @@ cv2.putText(image, f'{label} {conf:.2f}', (x1+7, y2-7),
 - firedetect-11s.pt 사전학습 모델 활용
 
 
+- MQTT Broker로 화재감지 데이터 전달
+
+
+
+
+<img width="814" height="575" alt="image" src="https://github.com/user-attachments/assets/1f4d19cc-a332-4fd3-98d5-b04aa12ea776" />
+
+
+- 화재감지 모니터링 - [firedetect.html](./toyproject/ToyProjects04/BackendCs/ResponseAiServer/wwwroot/firedetect.html)
+
+
+- 실핼결과
+  
+https://github.com/user-attachments/assets/629f53a3-dfab-4e51-b7ee-0ad8f3104b80
