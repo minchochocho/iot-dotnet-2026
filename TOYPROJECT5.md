@@ -304,6 +304,49 @@ https://github.com/user-attachments/assets/650b81f8-cb7e-4402-842c-b971e1293a3e
 
 - 아두이노 + 라즈베리파이 5
 
+### MQTT 통신 구현
+
+- Raspbian -> Windows MQTT 통신
+- Python MQTT 기본통신 - [소스](./toyproject/ToyProjects05/raspberrypi_part/test_mqtt.py)
+
+- 라즈베리파이 파이썬 실행상태
+
+![alt text](image-309.png)
+
+- 윈도우 MQTT 브로커 상태
+
+![alt text](image-310.png)
+
+#### 아두이노와 라즈베리파이 간 데이터 전달
+
+1. 블루투스
+2. `시리얼통신`
+3. LAN 실드로 LAN선 연결
+
+- 시리얼통신, 컨베이어 인식결과를 시리얼통신으로 전달 파이썬에서 확인
+
+- 라즈베리파이에 연결된 시리얼 포트번호
+
+![alt text](image-312.png)
+
+- Python 시리얼 라이브러리 설치
+
+```bash
+> pip install pyserial
+```
+
+- 아두이노 시리얼 연결 테스트 - [소스](./toyproject/ToyProjects05/raspberrypi_part/test_serial.py)
+
+- 시리얼 데이터 확인
+
+![alt text](image-311.png)
+
+- MQTT 소스 + 시리얼통신 + 양방향 통신 - [소스](./toyproject/ToyProjects05/raspberrypi_part/data_interface.py)
+
+- 통신 테스트
+  - Arduino 컨베이어벨트 시작
+  - RPi, Python 실행
+  - MQTT Explorer
 
 ### MQTT 통신 시스템
 
