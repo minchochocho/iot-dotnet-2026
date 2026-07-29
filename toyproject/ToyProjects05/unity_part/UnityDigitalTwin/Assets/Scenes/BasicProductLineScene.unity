@@ -157,6 +157,9 @@ MonoBehaviour:
   mqttUserName: root
   mqttPassword: mqtt123456
   topic: smartfactory/52/data
+  txtDeviceId: {fileID: 0}
+  txtTimestamp: {fileID: 0}
+  txtData: {fileID: 0}
   broker: 210.119.12.52
   userName: root
   password: mqtt123456
@@ -857,7 +860,7 @@ GameObject:
   - component: {fileID: 1088382163}
   - component: {fileID: 1088382162}
   m_Layer: 5
-  m_Name: LblDeviceId (2)
+  m_Name: LblData
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1028,7 +1031,7 @@ GameObject:
   - component: {fileID: 1290326139}
   - component: {fileID: 1290326138}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: LblTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1278,7 +1281,7 @@ GameObject:
   - component: {fileID: 1379723220}
   - component: {fileID: 1379723219}
   m_Layer: 5
-  m_Name: LblDeviceId (5)
+  m_Name: TxtData
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1608,6 +1611,9 @@ MonoBehaviour:
   mqttUserName: 
   mqttPassword: 
   topic: smartfactory/52/data
+  txtDeviceId: {fileID: 0}
+  txtTimestamp: {fileID: 0}
+  txtData: {fileID: 0}
   broker: 210.119.12.52
   userName: root
   password: mqtt123456
@@ -1933,7 +1939,7 @@ GameObject:
   - component: {fileID: 1706985924}
   - component: {fileID: 1706985923}
   m_Layer: 5
-  m_Name: LblDeviceId (3)
+  m_Name: TxtDeviceId
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2070,7 +2076,7 @@ GameObject:
   - component: {fileID: 1818793024}
   - component: {fileID: 1818793023}
   m_Layer: 5
-  m_Name: LblDeviceId (4)
+  m_Name: TxtTimestamp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2242,7 +2248,7 @@ GameObject:
   - component: {fileID: 1978139000}
   - component: {fileID: 1978138999}
   m_Layer: 5
-  m_Name: LblDeviceId (1)
+  m_Name: LblTimestamp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
