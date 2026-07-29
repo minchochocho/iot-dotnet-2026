@@ -434,7 +434,7 @@ https://github.com/user-attachments/assets/650b81f8-cb7e-4402-842c-b971e1293a3e
 
 #### 실행결과
 
-- 동영상 업로드
+https://github.com/user-attachments/assets/1e40400e-8f26-471d-87a2-7214bc70c926
 
 - 미니프로젝트 3에서 진행
 
